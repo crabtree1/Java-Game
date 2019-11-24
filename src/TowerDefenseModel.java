@@ -1,21 +1,31 @@
 import java.util.ArrayList;
+import java.util.Observable;
 
-public class TowerDefenseModel {
+public class TowerDefenseModel extends Observable{
 
-	private ArrayList<ArrayList<Tower>> towerMap;
-	private ArrayList<ArrayList<Integer>> road;
+	private Tower[][] towerMap;
+	private Road road;
 	
 	public TowerDefenseModel() {
-		for (int i = 0; i < 13; i++) {
-			ArrayList<Tower> temp = new ArrayList<Tower>();
-			towerMap.add(temp);
-		}
-		
-		for (int i = 0; i < 13; i++) {
-			ArrayList<Integer> temp = new ArrayList<Integer>();
-			for (int j = 0; j < 15; j++) {
-				if (j == 1)
-			}
+		towerMap = new Tower[13][15];
+		road = new Road1();
+	}
+	
+	public Road getRoad() {
+		return road;
+	}
+	
+	public Tower[][] getTowerMap() {
+		return towerMap;
+	}
+	
+	public void addTower(Tower currTowerClicked, int x, int y) {
+		if (currTowerClicked != null && towerMap[x][y] == null && road.getMap()[x][y] == 0) {
+			towerMap[x][y] = currTowerClicked;
+			
+			int[] returnArray = {x, y};
+			setChanged();
+			notifyObservers(returnArray);
 		}
 	}
 }
