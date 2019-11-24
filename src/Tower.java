@@ -28,4 +28,5 @@ public class Tower {
 	public int getY() {
 		return this.y;
 	}
+	
 }
