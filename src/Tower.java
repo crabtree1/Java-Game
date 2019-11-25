@@ -1,5 +1,7 @@
 
 public class Tower {
+	
+	protected String towerPic;
 	private int x;
 	private int y;
 	
@@ -27,6 +29,10 @@ public class Tower {
 	
 	public int getY() {
 		return this.y;
+	}
+	
+	public String getTowerPic() {
+		return towerPic;
 	}
 	
 }

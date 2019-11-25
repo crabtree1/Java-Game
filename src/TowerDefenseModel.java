@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Observable;
 
 public class TowerDefenseModel extends Observable{

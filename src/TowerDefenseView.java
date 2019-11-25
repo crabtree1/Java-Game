@@ -4,12 +4,14 @@ import java.util.Observer;
 import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -97,19 +99,19 @@ public class TowerDefenseView extends Application implements Observer {
 			currTowerClicked = new BirdPersonTower();
 		});
 		
-		VBox unknownTowerBox = new VBox();
-		unknownTowerBox.setMinWidth(105);
-		unknownTowerBox.setMinHeight(100);
-		unknownTowerBox.setStyle("-fx-background-color:#5D14E3");
-		Text unknownTowerText = new Text("Unknown");
-		unknownTowerBox.getChildren().add(unknownTowerText);
-		unknownTowerBox.setOnMouseClicked((event) -> {
-			currTowerClicked = new UnknownTower();
+		VBox squanchyTowerBox = new VBox();
+		squanchyTowerBox.setMinWidth(105);
+		squanchyTowerBox.setMinHeight(100);
+		squanchyTowerBox.setStyle("-fx-background-color:#5D14E3");
+		Text squanchyTowerText = new Text("Squanchy");
+		squanchyTowerBox.getChildren().add(squanchyTowerText);
+		squanchyTowerBox.setOnMouseClicked((event) -> {
+			currTowerClicked = new SquanchyTower();
 		});
 		
 		towerBox.getChildren().addAll(moneyLivesBox, rickTowerBox, mortyTowerBox,
 									  meeseeksTowerBox, jerryTowerBox, 
-									  birdpersonTowerBox, unknownTowerBox);
+									  birdpersonTowerBox, squanchyTowerBox);
 		
 		border.setBottom(towerBox);
 		
@@ -125,10 +127,11 @@ public class TowerDefenseView extends Application implements Observer {
 				temp.setWidth(47);
 				temp.setHeight(47);
 				if (currMap[i][j] == 0) {
-					temp.setFill(Color.GREEN);
+					temp.setFill(Color.YELLOWGREEN);
 				}
 				else {
-					temp.setFill(Color.RED);
+					Image pic = new Image("/pictures/road.png");
+					temp.setFill(new ImagePattern(pic));
 				}
 				grid.add(temp, j, i);
 			}
@@ -148,8 +151,10 @@ public class TowerDefenseView extends Application implements Observer {
 		int[] coords = (int[]) arg;
 		for (Node node: grid.getChildren()) {
 			if(grid.getRowIndex(node) == coords[0] && grid.getColumnIndex(node) == coords[1]) {
+				Image pic = new Image(currTowerClicked.getTowerPic());
+	
 	            Rectangle curr = (Rectangle) node;
-	            curr.setFill(Color.YELLOW);
+				curr.setFill(new ImagePattern(pic));
 	            break;
 			}
 		}
