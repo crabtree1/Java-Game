@@ -40,13 +40,13 @@ public class TowerDefenseView extends Application implements Observer {
 		sideBar = new VBox();
 		sideBar.setMinHeight(600);
 		sideBar.setMinWidth(295);
-		sideBar.setStyle("-fx-border-color: purple;\n"
+		sideBar.setStyle("-fx-border-color: black;\n"
                 + "-fx-border-width: 6;\n");
 		border.setRight(sideBar);
 		
 		towerText = new Rectangle();
 		towerText.setWidth(295);
-		towerText.setHeight(89);
+		towerText.setHeight(100);
 		towerText.setFill(Color.BLACK);
 		
 		
@@ -57,7 +57,7 @@ public class TowerDefenseView extends Application implements Observer {
 		VBox moneyLivesBox = new VBox();
 		moneyLivesBox.setStyle("-fx-background-color:#1426E3");
 		moneyLivesBox.setMinHeight(100);
-		moneyLivesBox.setMinWidth(100);
+		moneyLivesBox.setMinWidth(105);
 		Text money = new Text("  $ Money: 0");
 		money.setFill(Color.YELLOW);
 		Text lives = new Text("  <3 Lives: 100");
@@ -67,9 +67,12 @@ public class TowerDefenseView extends Application implements Observer {
 		VBox rickTowerBox = new VBox();
 		rickTowerBox.setMinWidth(100);
 		rickTowerBox.setMinHeight(100);
-		rickTowerBox.setStyle("-fx-background-color:#E33914");
-		Text rickTowerText = new Text("Rick");
-		rickTowerBox.getChildren().add(rickTowerText);
+		Rectangle rickPanel = new Rectangle();
+		rickPanel.setWidth(100);
+		rickPanel.setHeight(100);
+		Image rickPanelImg = new Image("/pictures/rickPanel.png");
+		rickPanel.setFill(new ImagePattern(rickPanelImg));
+		rickTowerBox.getChildren().add(rickPanel);
 		rickTowerBox.setOnMouseClicked((event) -> {
 			currTowerClicked = new RickTower();
 			setPortrait();
@@ -78,9 +81,12 @@ public class TowerDefenseView extends Application implements Observer {
 		VBox mortyTowerBox = new VBox();
 		mortyTowerBox.setMinWidth(100);
 		mortyTowerBox.setMinHeight(100);
-		mortyTowerBox.setStyle("-fx-background-color:#E3DC14");
-		Text mortyTowerText = new Text("Morty");
-		mortyTowerBox.getChildren().add(mortyTowerText);
+		Rectangle mortyPanel = new Rectangle();
+		mortyPanel.setWidth(100);
+		mortyPanel.setHeight(100);
+		Image mortyPanelImg = new Image("/pictures/mortyPanel.png");
+		mortyPanel.setFill(new ImagePattern(mortyPanelImg));
+		mortyTowerBox.getChildren().add(mortyPanel);
 		mortyTowerBox.setOnMouseClicked((event) -> {
 			currTowerClicked = new MortyTower();
 			setPortrait();
@@ -89,9 +95,12 @@ public class TowerDefenseView extends Application implements Observer {
 		VBox meeseeksTowerBox = new VBox();
 		meeseeksTowerBox.setMinWidth(100);
 		meeseeksTowerBox.setMinHeight(100);
-		meeseeksTowerBox.setStyle("-fx-background-color:#C7E314");
-		Text meeseeksTowerText = new Text("Mr. Meeseeks");
-		meeseeksTowerBox.getChildren().add(meeseeksTowerText);
+		Rectangle meeseeksPanel = new Rectangle();
+		meeseeksPanel.setWidth(100);
+		meeseeksPanel.setHeight(100);
+		Image meeseeksPanelImg = new Image("/pictures/meeseeksPanel.png");
+		meeseeksPanel.setFill(new ImagePattern(meeseeksPanelImg));
+		meeseeksTowerBox.getChildren().add(meeseeksPanel);
 		meeseeksTowerBox.setOnMouseClicked((event) -> {
 			currTowerClicked = new MeeseeksTower();
 			setPortrait();
@@ -100,9 +109,12 @@ public class TowerDefenseView extends Application implements Observer {
 		VBox jerryTowerBox = new VBox();
 		jerryTowerBox.setMinWidth(100);
 		jerryTowerBox.setMinHeight(100);
-		jerryTowerBox.setStyle("-fx-background-color:#14E33C");
-		Text jerryTowerText = new Text("Jerry");
-		jerryTowerBox.getChildren().add(jerryTowerText);
+		Rectangle jerryPanel = new Rectangle();
+		jerryPanel.setWidth(100);
+		jerryPanel.setHeight(100);
+		Image jerryPanelImg = new Image("/pictures/jerryPanel.png");
+		jerryPanel.setFill(new ImagePattern(jerryPanelImg));
+		jerryTowerBox.getChildren().add(jerryPanel);
 		jerryTowerBox.setOnMouseClicked((event) -> {
 			currTowerClicked = new JerryTower();
 			setPortrait();
@@ -111,20 +123,26 @@ public class TowerDefenseView extends Application implements Observer {
 		VBox birdpersonTowerBox = new VBox();
 		birdpersonTowerBox.setMinWidth(100);
 		birdpersonTowerBox.setMinHeight(100);
-		birdpersonTowerBox.setStyle("-fx-background-color:#14E3CB");
-		Text birdpersonTowerText = new Text("Bird Person");
-		birdpersonTowerBox.getChildren().add(birdpersonTowerText);
+		Rectangle birdpersonPanel = new Rectangle();
+		birdpersonPanel.setWidth(100);
+		birdpersonPanel.setHeight(100);
+		Image birdpersonPanelImg = new Image("/pictures/birdpersonPanel.png");
+		birdpersonPanel.setFill(new ImagePattern(birdpersonPanelImg));
+		birdpersonTowerBox.getChildren().add(birdpersonPanel);
 		birdpersonTowerBox.setOnMouseClicked((event) -> {
 			currTowerClicked = new BirdPersonTower();
 			setPortrait();
 		});
 		
 		VBox squanchyTowerBox = new VBox();
-		squanchyTowerBox.setMinWidth(105);
+		squanchyTowerBox.setMinWidth(100);
 		squanchyTowerBox.setMinHeight(100);
-		squanchyTowerBox.setStyle("-fx-background-color:#5D14E3");
-		Text squanchyTowerText = new Text("Squanchy");
-		squanchyTowerBox.getChildren().add(squanchyTowerText);
+		Rectangle squanchyPanel = new Rectangle();
+		squanchyPanel.setWidth(100);
+		squanchyPanel.setHeight(100);
+		Image squanchyPanelImg = new Image("/pictures/squanchyPanel.png");
+		squanchyPanel.setFill(new ImagePattern(squanchyPanelImg));
+		squanchyTowerBox.getChildren().add(squanchyPanel);
 		squanchyTowerBox.setOnMouseClicked((event) -> {
 			currTowerClicked = new SquanchyTower();
 			setPortrait();
@@ -149,7 +167,8 @@ public class TowerDefenseView extends Application implements Observer {
 				temp.setWidth(47);
 				temp.setHeight(47);
 				if (currMap[i][j] == 0) {
-					temp.setFill(Color.YELLOWGREEN);
+					Image pic = new Image("/pictures/space.png");
+					temp.setFill(new ImagePattern(pic));
 				}
 				else if (currMap[i][j] == 1){
 					Image pic = new Image("/pictures/road.png");
@@ -166,7 +185,7 @@ public class TowerDefenseView extends Application implements Observer {
 
 		// right bar (width): 295px
 		// map (width): 705px
-		Scene scene = new Scene(border, 1000, 700);
+		Scene scene = new Scene(border, 1000, 711);
 		stage.setScene(scene);
 		stage.show();
 		
