@@ -5,7 +5,6 @@ import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -22,6 +21,9 @@ public class TowerDefenseView extends Application implements Observer {
 	private TowerDefenseController controller;
 	private Tower currTowerClicked = null;
 	private GridPane grid;
+	private VBox sideBar;
+	private HBox towerBox;
+	private Rectangle towerText;
 	
 	
 	@Override
@@ -34,9 +36,22 @@ public class TowerDefenseView extends Application implements Observer {
 		
 		BorderPane border = new BorderPane();
 		
+		//Creates side bar
+		sideBar = new VBox();
+		sideBar.setMinHeight(600);
+		sideBar.setMinWidth(295);
+		sideBar.setStyle("-fx-border-color: purple;\n"
+                + "-fx-border-width: 6;\n");
+		border.setRight(sideBar);
+		
+		towerText = new Rectangle();
+		towerText.setWidth(295);
+		towerText.setHeight(89);
+		towerText.setFill(Color.BLACK);
+		
 		
 		//Creates tower panels
-		HBox towerBox = new HBox();
+		towerBox = new HBox();
 		towerBox.setMaxWidth(705);
 		
 		VBox moneyLivesBox = new VBox();
@@ -57,6 +72,7 @@ public class TowerDefenseView extends Application implements Observer {
 		rickTowerBox.getChildren().add(rickTowerText);
 		rickTowerBox.setOnMouseClicked((event) -> {
 			currTowerClicked = new RickTower();
+			setPortrait();
 		});
 		
 		VBox mortyTowerBox = new VBox();
@@ -67,6 +83,7 @@ public class TowerDefenseView extends Application implements Observer {
 		mortyTowerBox.getChildren().add(mortyTowerText);
 		mortyTowerBox.setOnMouseClicked((event) -> {
 			currTowerClicked = new MortyTower();
+			setPortrait();
 		});
 		
 		VBox meeseeksTowerBox = new VBox();
@@ -77,6 +94,7 @@ public class TowerDefenseView extends Application implements Observer {
 		meeseeksTowerBox.getChildren().add(meeseeksTowerText);
 		meeseeksTowerBox.setOnMouseClicked((event) -> {
 			currTowerClicked = new MeeseeksTower();
+			setPortrait();
 		});
 		
 		VBox jerryTowerBox = new VBox();
@@ -87,6 +105,7 @@ public class TowerDefenseView extends Application implements Observer {
 		jerryTowerBox.getChildren().add(jerryTowerText);
 		jerryTowerBox.setOnMouseClicked((event) -> {
 			currTowerClicked = new JerryTower();
+			setPortrait();
 		});
 		
 		VBox birdpersonTowerBox = new VBox();
@@ -97,6 +116,7 @@ public class TowerDefenseView extends Application implements Observer {
 		birdpersonTowerBox.getChildren().add(birdpersonTowerText);
 		birdpersonTowerBox.setOnMouseClicked((event) -> {
 			currTowerClicked = new BirdPersonTower();
+			setPortrait();
 		});
 		
 		VBox squanchyTowerBox = new VBox();
@@ -107,13 +127,15 @@ public class TowerDefenseView extends Application implements Observer {
 		squanchyTowerBox.getChildren().add(squanchyTowerText);
 		squanchyTowerBox.setOnMouseClicked((event) -> {
 			currTowerClicked = new SquanchyTower();
+			setPortrait();
 		});
 		
 		towerBox.getChildren().addAll(moneyLivesBox, rickTowerBox, mortyTowerBox,
 									  meeseeksTowerBox, jerryTowerBox, 
-									  birdpersonTowerBox, squanchyTowerBox);
+									  birdpersonTowerBox, squanchyTowerBox, towerText);
 		
 		border.setBottom(towerBox);
+		
 		
 		//Creates map
 		grid = new GridPane();
@@ -129,8 +151,12 @@ public class TowerDefenseView extends Application implements Observer {
 				if (currMap[i][j] == 0) {
 					temp.setFill(Color.YELLOWGREEN);
 				}
-				else {
+				else if (currMap[i][j] == 1){
 					Image pic = new Image("/pictures/road.png");
+					temp.setFill(new ImagePattern(pic));
+				}
+				else {
+					Image pic = new Image("/pictures/portal.png");
 					temp.setFill(new ImagePattern(pic));
 				}
 				grid.add(temp, j, i);
@@ -138,11 +164,27 @@ public class TowerDefenseView extends Application implements Observer {
 		}
 		border.setCenter(grid);
 
-
-		Scene scene = new Scene(border, 705, 700);
+		// right bar (width): 295px
+		// map (width): 705px
+		Scene scene = new Scene(border, 1000, 700);
 		stage.setScene(scene);
 		stage.show();
 		
+	}
+	
+	public void setPortrait() {
+		Rectangle portrait = new Rectangle();
+		portrait.setWidth(295);
+		portrait.setHeight(600);
+		Image currPortrait = new Image(currTowerClicked.getTowerPortrait());
+		portrait.setFill(new ImagePattern(currPortrait));
+		sideBar.getChildren().clear();
+		sideBar.getChildren().add(portrait);
+		
+		towerBox.getChildren().remove(towerText);
+		Image currName = new Image(currTowerClicked.getTowerName());
+		towerText.setFill(new ImagePattern(currName));
+		towerBox.getChildren().add(towerText);
 	}
 
 

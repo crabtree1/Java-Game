@@ -2,6 +2,8 @@
 public class Tower {
 	
 	protected String towerPic;
+	protected String towerPortrait;
+	protected String towerName;
 	private int x;
 	private int y;
 	
@@ -33,6 +35,14 @@ public class Tower {
 	
 	public String getTowerPic() {
 		return towerPic;
+	}
+	
+	public String getTowerPortrait() {
+		return towerPortrait;
+	}
+	
+	public String getTowerName() {
+		return towerName;
 	}
 	
 }
