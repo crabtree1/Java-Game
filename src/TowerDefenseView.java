@@ -1,7 +1,11 @@
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.GroupLayout.Alignment;
+
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -12,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -55,14 +60,26 @@ public class TowerDefenseView extends Application implements Observer {
 		towerBox.setMaxWidth(705);
 		
 		VBox moneyLivesBox = new VBox();
-		moneyLivesBox.setStyle("-fx-background-color:#1426E3");
+		moneyLivesBox.setStyle("-fx-background-image: url(\"pictures/moneyLivesBackground.png\")");
+		moneyLivesBox.setPadding(new Insets(5, 0, 0, 25));
 		moneyLivesBox.setMinHeight(100);
 		moneyLivesBox.setMinWidth(105);
-		Text money = new Text("  $ Money: 0");
+		moneyLivesBox.setAlignment(Pos.TOP_CENTER);
+		Text money = new Text("3");
+		money.setFont(Font.font ("Verdana", 23));
 		money.setFill(Color.YELLOW);
-		Text lives = new Text("  <3 Lives: 100");
+		Text lives = new Text("100");
+		lives.setFont(Font.font ("Verdana", 23));
 		lives.setFill(Color.YELLOW);
-		moneyLivesBox.getChildren().addAll(money, lives);
+		moneyLivesBox.getChildren().addAll(lives, money);
+		
+		//sell button
+		Rectangle sellButton = new Rectangle();
+		sellButton.setWidth(60);
+		sellButton.setHeight(35);
+		Image sellButtonImg = new Image("pictures/sellButton.png");
+		sellButton.setFill(new ImagePattern(sellButtonImg));
+		moneyLivesBox.getChildren().add(sellButton);
 		
 		VBox rickTowerBox = new VBox();
 		rickTowerBox.setMinWidth(100);
@@ -188,7 +205,6 @@ public class TowerDefenseView extends Application implements Observer {
 		Scene scene = new Scene(border, 1000, 711);
 		stage.setScene(scene);
 		stage.show();
-		
 	}
 	
 	public void setPortrait() {
