@@ -4,6 +4,8 @@ public class TowerDefenseModel extends Observable{
 
 	private Tower[][] towerMap;
 	private Road road;
+	private int health = 100;
+	private int money = 100;
 	
 	public TowerDefenseModel() {
 		towerMap = new Tower[13][15];
@@ -26,5 +28,13 @@ public class TowerDefenseModel extends Observable{
 			setChanged();
 			notifyObservers(returnArray);
 		}
+	}
+	
+	public int getMoney() {
+		return this.money;
+	}
+	
+	public int getHealth() {
+		return this.health;
 	}
 }

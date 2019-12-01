@@ -36,4 +36,12 @@ public class TowerDefenseController {
 		}
 		model.addTower(currTowerClicked, row, col);
 	}
+	
+	public int getMoney() {
+		return this.model.getMoney();
+	}
+	
+	public int getHealth() {
+		return this.model.getHealth();
+	}
 }

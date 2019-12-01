@@ -65,10 +65,10 @@ public class TowerDefenseView extends Application implements Observer {
 		moneyLivesBox.setMinHeight(100);
 		moneyLivesBox.setMinWidth(105);
 		moneyLivesBox.setAlignment(Pos.TOP_CENTER);
-		Text money = new Text("3");
+		Text money = new Text(Integer.toString(this.controller.getMoney()));
 		money.setFont(Font.font ("Verdana", 23));
 		money.setFill(Color.YELLOW);
-		Text lives = new Text("100");
+		Text lives = new Text(Integer.toString(this.controller.getHealth()));
 		lives.setFont(Font.font ("Verdana", 23));
 		lives.setFill(Color.YELLOW);
 		moneyLivesBox.getChildren().addAll(lives, money);
