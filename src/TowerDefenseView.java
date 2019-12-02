@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -8,6 +9,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -15,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -29,6 +32,7 @@ public class TowerDefenseView extends Application implements Observer {
 	private VBox sideBar;
 	private HBox towerBox;
 	private Rectangle towerText;
+
 	
 	
 	@Override
@@ -191,9 +195,17 @@ public class TowerDefenseView extends Application implements Observer {
 					Image pic = new Image("/pictures/road.png");
 					temp.setFill(new ImagePattern(pic));
 				}
-				else {
+				else if (currMap[i][j] == 2){
 					Image pic = new Image("/pictures/portal.png");
 					temp.setFill(new ImagePattern(pic));
+				} else {
+					temp.setFill(Paint.valueOf("red"));
+					temp.setOnMouseClicked(e -> {
+						if (controller.getGamePhase().equals("place")) {
+							controller.startRound();
+						}
+
+					});
 				}
 				grid.add(temp, j, i);
 			}
@@ -205,7 +217,13 @@ public class TowerDefenseView extends Application implements Observer {
 		Scene scene = new Scene(border, 1000, 711);
 		stage.setScene(scene);
 		stage.show();
+		//playGame();
 	}
+	
+
+	
+	
+	
 	
 	public void setPortrait() {
 		Rectangle portrait = new Rectangle();
@@ -222,19 +240,52 @@ public class TowerDefenseView extends Application implements Observer {
 		towerBox.getChildren().add(towerText);
 	}
 
+	
+	public Rectangle findNode(int x, int y) {
+		for (Node node: grid.getChildren()) {
+			if(grid.getRowIndex(node) == x && grid.getColumnIndex(node) == y) {
+				Rectangle curr = (Rectangle) node;
+				return curr;
+			}
+		}
+		return null;
+	}
 
 	@Override
 	public void update(Observable o, Object arg) {
-		int[] coords = (int[]) arg;
-		for (Node node: grid.getChildren()) {
-			if(grid.getRowIndex(node) == coords[0] && grid.getColumnIndex(node) == coords[1]) {
-				Image pic = new Image(currTowerClicked.getTowerPic());
-	
-	            Rectangle curr = (Rectangle) node;
-				curr.setFill(new ImagePattern(pic));
-	            break;
+		if (controller.getGamePhase().equals("place")) {
+			int[] coords = (int[]) arg;
+			Rectangle curr = findNode(coords[0], coords[1]);
+			Image pic = new Image(currTowerClicked.getTowerPic());
+	        curr.setFill(new ImagePattern(pic));
+
+		} else {
+			ArrayList<Enemy> enemies = (ArrayList<Enemy>) arg;
+			int[][] currMap = controller.getRoad().getMap();
+			for (int i = 0; i < currMap.length; i++) {
+				for (int j = 0; j < currMap[i].length; j++) {
+					boolean found  = false;
+					if (currMap[i][j] == 1) {
+						Rectangle curr = findNode(i, j);
+						for (int k = 0; k < enemies.size(); k++) {
+							Enemy currEnemy = enemies.get(k);
+							if (i == currEnemy.getX() && j == currEnemy.getY()) {
+								curr.setFill(Paint.valueOf(currEnemy.getTowerPic()));
+								found = true;
+								break;
+							}
+						}
+						if (!found) {
+							Image pic = new Image("/pictures/road.png");
+							curr.setFill(new ImagePattern(pic));
+						}
+					}
+
+				}
 			}
+			
 		}
+
 	}
 
 }
