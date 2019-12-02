@@ -9,11 +9,11 @@ public class TowerDefenseModel extends Observable{
 	private int health = 100;
 	private int money = 100;
 	private String gamePhase;
-	private int roundTime;
+	private int roundEnemies;
 	private int[][] pathToFollow;
 	
 	public TowerDefenseModel() {
-		roundTime = 120;
+		roundEnemies = 40;
 		gamePhase = "place";
 		int[][] temp = { {0,13}, {1,13}, {2,13}, {3,13}, {3,12}, {3,11}, {2,11}, {1,11}, {1,10},
 		{1,9},{1,8}, {1,7}, {1,6}, {1,5}, {1,4}, {1,3}, {1,2}, {1,1}, {2,1}, {3,1},{4,1},{5,1},
@@ -38,20 +38,19 @@ public class TowerDefenseModel extends Observable{
 		Thread thread = new Thread(){
 			public void run() {
 				int i = 0;
-				while(i < roundTime) {
+				while(i < roundEnemies || enemyMap.size() != 0) {
 					int randomEnemy = (int) (Math.random() * 2);
 					moveEnemies();
 					int createProb = (int) (Math.random() * 4);
-					if (createProb < 1) {
+					if (createProb < 1 && i < roundEnemies) {
 						createEnemy(randomEnemy);
+						i += 1;
 					}
-					
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					i += 1;
 				}
 				gamePhase = "place";
 			}
