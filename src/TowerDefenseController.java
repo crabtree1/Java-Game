@@ -16,6 +16,10 @@ public class TowerDefenseController {
 		return model.getTowerMap();
 	}
 	
+	public void startRound() {
+		model.startRound();
+	}
+	
 	public void addTower(Tower currTowerClicked, double mouseX, double mouseY) {
 		int row = 0;
 		int col = 0;
@@ -34,7 +38,13 @@ public class TowerDefenseController {
 				row = i;
 			}
 		}
+
 		model.addTower(currTowerClicked, row, col);
+		
+	}
+	
+	public String getGamePhase() {
+		return model.getGamePhase();
 	}
 	
 	public int getMoney() {

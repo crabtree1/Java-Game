@@ -1,3 +1,4 @@
+import javafx.scene.paint.Paint;
 
 public class ToxicRickEnemy extends Enemy {
 	private int timesHit;
@@ -6,7 +7,7 @@ public class ToxicRickEnemy extends Enemy {
 		super();
 		this.towerName = "ToxicRick";
 		this.timesHit = 0;
-		//this.towerPic = "pathToPic";
+		this.towerPic = "blue";
 		//this.towerPortrait = "PathToPortrait";
 	}
 	
