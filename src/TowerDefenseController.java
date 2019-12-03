@@ -8,6 +8,10 @@ public class TowerDefenseController {
 		this.model = model;
 	}
 	
+	public void setModel(TowerDefenseModel model) {
+		this.model = model;
+	}
+	
 	public Road getRoad() {
 		return model.getRoad();
 	}

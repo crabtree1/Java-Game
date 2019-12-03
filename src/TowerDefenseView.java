@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Optional;
 
 import javax.swing.GroupLayout.Alignment;
 
@@ -12,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
@@ -240,11 +242,6 @@ public class TowerDefenseView extends Application implements Observer {
 		//playGame();
 	}
 	
-
-	
-	
-	
-	
 	public void setPortrait() {
 		Rectangle portrait = new Rectangle();
 		portrait.setWidth(295);
@@ -272,10 +269,20 @@ public class TowerDefenseView extends Application implements Observer {
 	}
 	
 	private void showLost() {
-		Alert winAlert = new Alert(AlertType.INFORMATION);
-		winAlert.setHeaderText("Message");
-		winAlert.setContentText("You lost!");
-		winAlert.showAndWait();
+		Alert lossAlert = new Alert(AlertType.INFORMATION);
+		lossAlert.setHeaderText("Message");
+		lossAlert.setContentText("You lost! New Game?");
+		ButtonType newGame = new ButtonType("NewGame");
+		lossAlert.getButtonTypes().add(newGame);
+		Optional<ButtonType> option = lossAlert.showAndWait();
+		
+		if(option.get() == newGame) {
+			TowerDefenseModel model = new TowerDefenseModel();
+			this.controller.setModel(model);
+			model.addObserver(this);
+			update(model, this);
+		}
+		
 	}
 
 	@Override
@@ -328,9 +335,10 @@ public class TowerDefenseView extends Application implements Observer {
 					for (int k = 0; k < enemies.size(); k ++) {
 						Enemy currEnemy = enemies.get(k);
 						if (towers[i][j] != null) {
+							int temp = currEnemy.getHealth();
 							if (towers[i][j] instanceof BirdPersonTower) {
 								currEnemy.takeDamage(1);
-								System.out.println(currEnemy.getHealth());
+								//System.out.println(currEnemy.getHealth());
 							} else if (currEnemy.getX() == i + 1 && currEnemy.getY() == j || //below
 								currEnemy.getX() == i - 1 && currEnemy.getY() == j || // above
 								currEnemy.getX() == i + 1 && currEnemy.getY() == j + 1 || // lower right diagonal
@@ -339,14 +347,13 @@ public class TowerDefenseView extends Application implements Observer {
 								currEnemy.getX() == i + 1 && currEnemy.getY() == j - 1 || // lower left diagonal
 								currEnemy.getX() == i && currEnemy.getY() == j - 1 || // left
 								currEnemy.getX() == i && currEnemy.getY() == j + 1) { // right
-								int temp = currEnemy.getHealth();
-								//System.out.println(towers[i][j].attackPower);
-								currEnemy.takeDamage(towers[i][j].attackPower);
-								//System.out.println(currEnemy.getHealth());
-								if((currEnemy.getHealth() < temp) && (currEnemy.getHealth() != 0)) {
-									this.controller.addAttackMoney();
-									money.setText(Integer.toString(this.controller.getMoney()));
-								}
+									//System.out.println(towers[i][j].attackPower);
+									currEnemy.takeDamage(towers[i][j].attackPower);
+									//System.out.println(currEnemy.getHealth());
+							}
+							if((currEnemy.getHealth() < temp) && (currEnemy.getHealth() != 0)) {
+								this.controller.addAttackMoney();
+								money.setText(Integer.toString(this.controller.getMoney()));
 							}
 						}
 					}
