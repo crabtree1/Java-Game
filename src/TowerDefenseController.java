@@ -68,6 +68,10 @@ public class TowerDefenseController {
 		}
 	}
 	
+	public void findTowerAtPosition(int row, int col) {
+		this.model.towerAtPosition(row, col);
+	}
+	
 	public String getGamePhase() {
 		return model.getGamePhase();
 	}

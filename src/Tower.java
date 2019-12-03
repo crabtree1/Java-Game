@@ -7,6 +7,7 @@ public class Tower {
 	private int x;
 	private int y;
 	protected int cost = 1;
+	protected int attackPower;
 	
 	public Tower() {
 		this.x = 0;
@@ -50,4 +51,7 @@ public class Tower {
 		return this.cost;
 	}
 	
+	public int getAttackPower() {
+		return this.attackPower;
+	}
 }

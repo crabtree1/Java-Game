@@ -32,4 +32,8 @@ public class Road1 extends Road {
 		map[11] = row11;
 		map[12] = row12;
 	}
+	
+	public int getValAtPos(int row, int col) {
+		return map[row][col];
+	}
 }

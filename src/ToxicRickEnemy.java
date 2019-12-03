@@ -11,9 +11,9 @@ public class ToxicRickEnemy extends Enemy {
 		//this.towerPortrait = "PathToPortrait";
 	}
 	
-	public void takeDamage() {
+	public void takeDamage(int damageAmount) {
 		if (timesHit % 2 == 0) {
-			super.takeDamage();
+			super.takeDamage(damageAmount);
 		}
 		
 		timesHit += 1;

@@ -52,8 +52,8 @@ public class Enemy {
 		return this.y;
 	}
 	
-	public void takeDamage() {
-		this.health -= 1;
+	public void takeDamage(int damageAmount) {
+		this.health -= damageAmount;
 	}
 
 }
