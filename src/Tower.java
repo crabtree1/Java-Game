@@ -6,6 +6,7 @@ public class Tower {
 	protected String towerName;
 	private int x;
 	private int y;
+	protected int cost = 1;
 	
 	public Tower() {
 		this.x = 0;
@@ -43,6 +44,10 @@ public class Tower {
 	
 	public String getTowerName() {
 		return towerName;
+	}
+	
+	public int getCost() {
+		return this.cost;
 	}
 	
 }

@@ -110,8 +110,32 @@ public class TowerDefenseModel extends Observable{
 		}
 	}
 	
+	public boolean towerAtPosition(int x, int y) {
+		if(towerMap[x][y] != null) {
+			return true;
+		}
+		return false;
+	}
+	
+	public Tower getTowerAtPost(int x, int y) {
+		return towerMap[x][y];
+	}
+	
+	public void removeTower(Tower currTowerClicked, int x, int y) {
+		towerMap[x][y] = null;
+		this.money += currTowerClicked.getCost()/2;
+		
+		int[] returnArray = {x, y};
+		setChanged();
+		notifyObservers(returnArray);
+	}
+	
 	public int getMoney() {
 		return this.money;
+	}
+	
+	public void spendMoney(int amount) {
+		this.money -= amount;
 	}
 	
 	public int getHealth() {

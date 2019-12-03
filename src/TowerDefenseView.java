@@ -32,6 +32,8 @@ public class TowerDefenseView extends Application implements Observer {
 	private VBox sideBar;
 	private HBox towerBox;
 	private Rectangle towerText;
+	private Text money;
+	private boolean isSelling = false;
 
 	
 	
@@ -69,7 +71,7 @@ public class TowerDefenseView extends Application implements Observer {
 		moneyLivesBox.setMinHeight(100);
 		moneyLivesBox.setMinWidth(105);
 		moneyLivesBox.setAlignment(Pos.TOP_CENTER);
-		Text money = new Text(Integer.toString(this.controller.getMoney()));
+		money = new Text(Integer.toString(this.controller.getMoney()));
 		money.setFont(Font.font ("Verdana", 23));
 		money.setFill(Color.YELLOW);
 		Text lives = new Text(Integer.toString(this.controller.getHealth()));
@@ -83,6 +85,13 @@ public class TowerDefenseView extends Application implements Observer {
 		sellButton.setHeight(35);
 		Image sellButtonImg = new Image("pictures/sellButton.png");
 		sellButton.setFill(new ImagePattern(sellButtonImg));
+		sellButton.setOnMouseClicked((event) -> {
+			if(this.isSelling) {
+				this.isSelling = false;
+			} else {
+				this.isSelling = true;
+			}
+		});
 		moneyLivesBox.getChildren().add(sellButton);
 		
 		VBox rickTowerBox = new VBox();
@@ -183,7 +192,14 @@ public class TowerDefenseView extends Application implements Observer {
 			for (int j = 0; j < currMap[i].length; j++) {
 				Rectangle temp = new Rectangle();
 				temp.setOnMouseClicked((event) -> {
-					controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY());
+					if(this.isSelling) {
+						this.controller.sellTower(event.getSceneX(), event.getSceneY());
+						this.isSelling = false;
+						Image pic = new Image("/pictures/space.png");
+						temp.setFill(new ImagePattern(pic));
+					} else {
+						controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY());
+					}
 				});
 				temp.setWidth(47);
 				temp.setHeight(47);
@@ -254,6 +270,7 @@ public class TowerDefenseView extends Application implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 		if (controller.getGamePhase().equals("place")) {
+			money.setText(Integer.toString(this.controller.getMoney()));
 			int[] coords = (int[]) arg;
 			Rectangle curr = findNode(coords[0], coords[1]);
 			Image pic = new Image(currTowerClicked.getTowerPic());
