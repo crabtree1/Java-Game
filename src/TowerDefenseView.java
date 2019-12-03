@@ -5,11 +5,14 @@ import java.util.Observer;
 import javax.swing.GroupLayout.Alignment;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -33,6 +36,7 @@ public class TowerDefenseView extends Application implements Observer {
 	private HBox towerBox;
 	private Rectangle towerText;
 	private Text money;
+	private Text lives;
 	private boolean isSelling = false;
 
 	
@@ -74,7 +78,7 @@ public class TowerDefenseView extends Application implements Observer {
 		money = new Text(Integer.toString(this.controller.getMoney()));
 		money.setFont(Font.font ("Verdana", 23));
 		money.setFill(Color.YELLOW);
-		Text lives = new Text(Integer.toString(this.controller.getHealth()));
+		lives = new Text(Integer.toString(this.controller.getHealth()));
 		lives.setFont(Font.font ("Verdana", 23));
 		lives.setFill(Color.YELLOW);
 		moneyLivesBox.getChildren().addAll(lives, money);
@@ -266,6 +270,13 @@ public class TowerDefenseView extends Application implements Observer {
 		}
 		return null;
 	}
+	
+	private void showLost() {
+		Alert winAlert = new Alert(AlertType.INFORMATION);
+		winAlert.setHeaderText("Message");
+		winAlert.setContentText("You lost!");
+		winAlert.showAndWait();
+	}
 
 	@Override
 	public void update(Observable o, Object arg) {
@@ -277,6 +288,17 @@ public class TowerDefenseView extends Application implements Observer {
 	        curr.setFill(new ImagePattern(pic));
 
 		} else {
+			if(this.controller.getHealth() <= 0) {
+				lives.setText("0");
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						showLost();
+					}
+				});
+			} else {
+				lives.setText(Integer.toString(this.controller.getHealth()));
+			}
 			ArrayList<Enemy> enemies = (ArrayList<Enemy>) arg;
 			int[][] currMap = controller.getRoad().getMap();
 			for (int i = 0; i < currMap.length; i++) {
@@ -320,7 +342,7 @@ public class TowerDefenseView extends Application implements Observer {
 								int temp = currEnemy.getHealth();
 								//System.out.println(towers[i][j].attackPower);
 								currEnemy.takeDamage(towers[i][j].attackPower);
-								System.out.println(currEnemy.getHealth());
+								//System.out.println(currEnemy.getHealth());
 								if((currEnemy.getHealth() < temp) && (currEnemy.getHealth() != 0)) {
 									this.controller.addAttackMoney();
 									money.setText(Integer.toString(this.controller.getMoney()));

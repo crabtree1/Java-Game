@@ -39,6 +39,9 @@ public class TowerDefenseModel extends Observable{
 			public void run() {
 				int i = 0;
 				while(i < roundEnemies || enemyMap.size() != 0) {
+					if(getHealth() < 0) {
+						break;
+					}
 					int randomEnemy = (int) (Math.random() * 2);
 					moveEnemies();
 					int createProb = (int) (Math.random() * 4);
@@ -60,6 +63,9 @@ public class TowerDefenseModel extends Observable{
 	
 	
 	public void createEnemy(int randomEnemy) {
+		if(health < 0) {
+			return;
+		}
 		Enemy enemy = null;
 		if (randomEnemy == 1) {
 			enemy = new PickelRickEnemy();
@@ -88,6 +94,9 @@ public class TowerDefenseModel extends Observable{
 				e.setCords(pathToFollow[i+1][0], pathToFollow[i+1][1]);
 				return;
 			}
+		}
+		if(e.getHealth() > 0) {
+			this.health -= e.getHealth();
 		}
 		enemyMap.remove(e);
 	}
