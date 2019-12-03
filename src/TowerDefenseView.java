@@ -214,13 +214,27 @@ public class TowerDefenseView extends Application implements Observer {
 				else if (currMap[i][j] == 2){
 					Image pic = new Image("/pictures/portal.png");
 					temp.setFill(new ImagePattern(pic));
-				} else {
+				} else if (currMap[i][j] == 3) {
+					temp.setFill(Paint.valueOf("purple"));
+					temp.setOnMouseClicked(e -> {
+						if (controller.getGamePhase().equals("attack")) {
+							controller.changePaused();
+						}
+					});
+				} else if (currMap[i][j] == 4){
 					temp.setFill(Paint.valueOf("red"));
 					temp.setOnMouseClicked(e -> {
 						if (controller.getGamePhase().equals("place")) {
 							controller.startRound();
 						}
 
+					});
+				} else {
+					temp.setFill(Paint.valueOf("pink"));
+					temp.setOnMouseClicked(e -> {
+						if (controller.getGamePhase().equals("attack")) {
+							controller.increaseGameSpeed();
+						}
 					});
 				}
 				grid.add(temp, j, i);
