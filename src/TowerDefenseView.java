@@ -317,9 +317,14 @@ public class TowerDefenseView extends Application implements Observer {
 								currEnemy.getX() == i + 1 && currEnemy.getY() == j - 1 || // lower left diagonal
 								currEnemy.getX() == i && currEnemy.getY() == j - 1 || // left
 								currEnemy.getX() == i && currEnemy.getY() == j + 1) { // right
+								int temp = currEnemy.getHealth();
 								//System.out.println(towers[i][j].attackPower);
 								currEnemy.takeDamage(towers[i][j].attackPower);
 								System.out.println(currEnemy.getHealth());
+								if((currEnemy.getHealth() < temp) && (currEnemy.getHealth() != 0)) {
+									this.controller.addAttackMoney();
+									money.setText(Integer.toString(this.controller.getMoney()));
+								}
 							}
 						}
 					}

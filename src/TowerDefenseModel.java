@@ -141,4 +141,12 @@ public class TowerDefenseModel extends Observable{
 	public int getHealth() {
 		return this.health;
 	}
+	
+	public void takeDamage() {
+		this.health -= 1;
+	}
+	
+	public void addAttackMoney() {
+		this.money += 1;
+	}
 }

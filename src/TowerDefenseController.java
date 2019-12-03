@@ -83,4 +83,12 @@ public class TowerDefenseController {
 	public int getHealth() {
 		return this.model.getHealth();
 	}
+	
+	public void addAttackMoney() {
+		this.model.addAttackMoney();
+	}
+	
+	public void takeHealth() {
+		this.model.takeDamage();
+	}
 }
