@@ -8,6 +8,8 @@ public class TowerDefenseModel extends Observable{
 	private Road road;
 	private int health = 100;
 	private int money = 100;
+	private int gameSpeed = 100;
+	private boolean paused = false;
 	private String gamePhase;
 	private int roundEnemies;
 	private int[][] pathToFollow;
@@ -33,21 +35,38 @@ public class TowerDefenseModel extends Observable{
 		return this.gamePhase;
 	}
 	
+	public void increaseGameSpeed() {
+		if(this.gameSpeed == 20) {
+			this.gameSpeed = 100;
+		} else {
+			this.gameSpeed -= 40;
+		}
+	}
+	
+	public void changePaused() {
+		this.paused = !this.paused;
+	}
+	
 	public void startRound() {
 		gamePhase = "attack";
 		Thread thread = new Thread(){
 			public void run() {
 				int i = 0;
 				while(i < roundEnemies || enemyMap.size() != 0) {
-					int randomEnemy = (int) (Math.random() * 2);
-					moveEnemies();
-					int createProb = (int) (Math.random() * 4);
-					if (createProb < 1 && i < roundEnemies) {
-						createEnemy(randomEnemy);
-						i += 1;
+					int speedToSleep = 10;
+					if (!paused) {
+						moveEnemies();
+						int createProb = (int) (Math.random() * 4);
+						if (createProb < 1 && i < roundEnemies) {
+							int randomEnemy = ((int) (Math.random() * 5)) + 1;
+							createEnemy(randomEnemy);
+							i += 1;
+						}
+						speedToSleep = gameSpeed;
 					}
+					
 					try {
-						Thread.sleep(100);
+						Thread.sleep(speedToSleep);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -63,8 +82,14 @@ public class TowerDefenseModel extends Observable{
 		Enemy enemy = null;
 		if (randomEnemy == 1) {
 			enemy = new PickelRickEnemy();
-		} else {
+		} else if  (randomEnemy == 2){
 			enemy = new ToxicRickEnemy();
+		} else if (randomEnemy == 3) {
+			enemy  = new DoofusRickEnemy();
+		} else if (randomEnemy == 4) {
+			enemy = new EvilRickEnemy();
+		} else {
+			enemy = new TinyRickEnemy();
 		}
 		
 		enemy.setCords(0, 13);
