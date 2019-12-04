@@ -93,6 +93,7 @@ public class TowerDefenseView extends Application implements Observer {
 		sellButton.setFill(new ImagePattern(sellButtonImg));
 		sellButton.setOnMouseClicked((event) -> {
 			if(this.isSelling) {
+				sellButton.setFill(new ImagePattern(new Image("pictures/sellButtonPressed.png")));
 				this.isSelling = false;
 			} else {
 				this.isSelling = true;
