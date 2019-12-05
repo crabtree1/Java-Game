@@ -72,6 +72,14 @@ public class TowerDefenseController {
 		}
 	}
 	
+	public void increaseGameSpeed() {
+		model.increaseGameSpeed();
+	}
+	
+	public void changePaused() {
+		model.changePaused();
+	}
+	
 	public void findTowerAtPosition(int row, int col) {
 		this.model.towerAtPosition(row, col);
 	}
