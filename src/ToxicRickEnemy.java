@@ -1,21 +1,21 @@
 import javafx.scene.paint.Paint;
 
 public class ToxicRickEnemy extends Enemy {
-	private int timesHit;
+	private int numHits;
 	
 	public ToxicRickEnemy() {
 		super();
 		this.towerName = "ToxicRick";
-		this.timesHit = 0;
 		this.towerPic = "blue";
+		this.numHits = 0;
 		//this.towerPortrait = "PathToPortrait";
 	}
 	
 	public void takeDamage(int damageAmount) {
-		if (timesHit % 2 == 0) {
+		// takes 3 hits to break through the grime shield
+		numHits ++;
+		if (numHits % 4 == 0) {
 			super.takeDamage(damageAmount);
 		}
-		
-		timesHit += 1;
 	}
 }

@@ -105,7 +105,9 @@ public class TowerDefenseModel extends Observable{
 	public void moveEnemies() {
 		for (int i = 0; i < enemyMap.size(); i++) {
 			Enemy e = enemyMap.get(i);
-			findNext(e);
+			if (e.getAlive()) {
+				findNext(e);
+			}
 		}
 		
 		setChanged();
@@ -182,5 +184,59 @@ public class TowerDefenseModel extends Observable{
 	
 	public int getHealth() {
 		return this.health;
+	}
+	
+	public void towerAttack() {
+		//Tower[][] towers = controller.getTowerMap();
+		for (int i = 0; i < towerMap.length; i ++) {
+			for (int j = 0; j < towerMap[i].length; j ++) {
+				for (int k = 0; k < enemyMap.size(); k ++) {
+					Enemy currEnemy = enemyMap.get(k);
+					if (towerMap[i][j] != null) {
+						int temp = currEnemy.getHealth();
+						if (towerMap[i][j] instanceof BirdPersonTower) {
+							currEnemy.takeDamage(1);
+							System.out.println(currEnemy.getHealth());
+						} else if (currEnemy.getX() == i + 1 && currEnemy.getY() == j || //below
+							currEnemy.getX() == i - 1 && currEnemy.getY() == j || // above
+							currEnemy.getX() == i + 1 && currEnemy.getY() == j + 1 || // lower right diagonal
+							currEnemy.getX() == i - 1 && currEnemy.getY() == j - 1 || // upper left diagonal
+							currEnemy.getX() == i - 1 && currEnemy.getY() == j + 1 || // upper right diagonal
+							currEnemy.getX() == i + 1 && currEnemy.getY() == j - 1 || // lower left diagonal
+							currEnemy.getX() == i && currEnemy.getY() == j - 1 || // left
+							currEnemy.getX() == i && currEnemy.getY() == j + 1) { // right
+								//System.out.println(towers[i][j].attackPower);
+								if (towerMap[i][j] instanceof MeeseeksTower) {
+									int damageMultiplier = (int) (Math.random() * 100);
+									if (damageMultiplier <= 50) {
+										currEnemy.takeDamage(towerMap[i][j].attackPower * 2);
+									} else {
+										currEnemy.takeDamage(towerMap[i][j].attackPower);
+									}
+								} else if (towerMap[i][j] instanceof SquanchyTower) {
+									int damageMultiplier = (int) (Math.random() * 100);
+									if (damageMultiplier <= 25) {
+										currEnemy.takeDamage(towerMap[i][j].attackPower * 4);
+									} else {
+										currEnemy.takeDamage(towerMap[i][j].attackPower);
+									}
+								} else if (towerMap[i][j] instanceof JerryTower && currEnemy
+										instanceof DoofusRickEnemy) {
+									currEnemy.takeDamage(towerMap[i][j].attackPower * 2);
+								} else {
+									currEnemy.takeDamage(towerMap[i][j].attackPower);
+									System.out.println(currEnemy.getHealth());
+								}
+						}
+						if((currEnemy.getHealth() < temp) && (currEnemy.getHealth() != 0)) {
+							addAttackMoney();
+						}
+						if (currEnemy.getHealth() <= 0) {
+							currEnemy.setAlive(false);
+						}
+					}
+				}
+			}
+		}
 	}
 }

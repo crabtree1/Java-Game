@@ -330,7 +330,7 @@ public class TowerDefenseView extends Application implements Observer {
 						Rectangle curr = findNode(i, j);
 						for (int k = 0; k < enemies.size(); k++) {
 							Enemy currEnemy = enemies.get(k);
-							if (i == currEnemy.getX() && j == currEnemy.getY()) {
+							if (i == currEnemy.getX() && j == currEnemy.getY() && currEnemy.getAlive()) {
 								curr.setFill(Paint.valueOf(currEnemy.getTowerPic()));
 								found = true;
 								break;
@@ -344,6 +344,10 @@ public class TowerDefenseView extends Application implements Observer {
 
 				}
 			}
+			this.controller.towerAttack();
+			money.setText(Integer.toString(this.controller.getMoney()));
+
+			/*
 			Tower[][] towers = controller.getTowerMap();
 			for (int i = 0; i < towers.length; i ++) {
 				for (int j = 0; j < towers[i].length; j ++) {
@@ -353,7 +357,7 @@ public class TowerDefenseView extends Application implements Observer {
 							int temp = currEnemy.getHealth();
 							if (towers[i][j] instanceof BirdPersonTower) {
 								currEnemy.takeDamage(1);
-								//System.out.println(currEnemy.getHealth());
+								System.out.println(currEnemy.getHealth());
 							} else if (currEnemy.getX() == i + 1 && currEnemy.getY() == j || //below
 								currEnemy.getX() == i - 1 && currEnemy.getY() == j || // above
 								currEnemy.getX() == i + 1 && currEnemy.getY() == j + 1 || // lower right diagonal
@@ -364,7 +368,7 @@ public class TowerDefenseView extends Application implements Observer {
 								currEnemy.getX() == i && currEnemy.getY() == j + 1) { // right
 									//System.out.println(towers[i][j].attackPower);
 									currEnemy.takeDamage(towers[i][j].attackPower);
-									//System.out.println(currEnemy.getHealth());
+									System.out.println(currEnemy.getHealth());
 							}
 							if((currEnemy.getHealth() < temp) && (currEnemy.getHealth() != 0)) {
 								this.controller.addAttackMoney();
@@ -374,6 +378,7 @@ public class TowerDefenseView extends Application implements Observer {
 					}
 				}
 			}
+			*/
 		}
 	}
 }
