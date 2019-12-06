@@ -1,6 +1,7 @@
 
 public class JerryTower extends Tower {
 
+	//jerry is weak so he only does the default 1 damage
 	public JerryTower() {
 		super();
 		this.cost = 50;

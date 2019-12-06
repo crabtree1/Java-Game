@@ -4,6 +4,7 @@ public class Enemy {
 	private int health;
 	private int x;
 	private int y;
+	private boolean alive;
 	
 	protected String towerPic;
 	protected String towerPortrait;
@@ -13,6 +14,7 @@ public class Enemy {
 		this.health = 100;
 		this.x = 0;
 		this.y = 0;
+		this.alive = true;
 	}
 	
 	public int getHealth() {
@@ -54,6 +56,14 @@ public class Enemy {
 	
 	public void takeDamage(int damageAmount) {
 		this.health -= damageAmount;
+	}
+	
+	public void setAlive(boolean life) {
+		this.alive = life;
+	}
+	
+	public boolean getAlive() {
+		return this.alive;
 	}
 
 }

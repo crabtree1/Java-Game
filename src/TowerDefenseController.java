@@ -103,4 +103,8 @@ public class TowerDefenseController {
 	public void takeHealth() {
 		this.model.takeDamage();
 	}
+	
+	public void towerAttack() {
+		this.model.towerAttack();
+	}
 }
