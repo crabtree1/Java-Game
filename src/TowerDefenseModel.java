@@ -95,7 +95,7 @@ public class TowerDefenseModel extends Observable{
 		} else if (randomEnemy == 4) {
 			enemy = new EvilRickEnemy();
 		} else {
-			enemy = new TinyRickEnemy();
+			enemy = new GuardRickEnemy();
 		}
 		
 		enemy.setCords(0, 13);

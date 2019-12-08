@@ -5,7 +5,7 @@ public class EvilRickEnemy extends Enemy {
 	public EvilRickEnemy() {
 		super();
 		this.towerName = "EvilRick";
-		this.towerPic = "white";
+		this.towerPic = "pictures/evilRick.png";
 		//this.towerPortrait = "PathToPortrait";
 	}
 	

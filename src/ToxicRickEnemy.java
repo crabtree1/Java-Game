@@ -6,7 +6,7 @@ public class ToxicRickEnemy extends Enemy {
 	public ToxicRickEnemy() {
 		super();
 		this.towerName = "ToxicRick";
-		this.towerPic = "blue";
+		this.towerPic = "pictures/toxicRick.png";
 		this.numHits = 0;
 		//this.towerPortrait = "PathToPortrait";
 	}

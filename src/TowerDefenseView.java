@@ -3,8 +3,6 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
 
-import javax.swing.GroupLayout.Alignment;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -12,8 +10,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
@@ -22,16 +23,150 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class TowerDefenseView extends Application implements Observer {
+	
+	private class TwoPlayerDialogBox extends Stage {
+		/**
+		 * Holds the data to select if it is a server or client
+		 */
+		private ToggleGroup createGroup;
+		
+		/**
+		 * Holds the port selected by the user; default 4000
+		 */
+		private TextField portField;
+		
+		/**
+		 * Holds the data to select if the game is played by a human or computer
+		 */
+		private ToggleGroup playAsGroup;
+		
+		/**
+		 * Holds the address of the server; default localhost
+		 */
+		private TextField serverField;
+		
+		/**
+		 * This is the constructor of the dialog box used by the user to select options about the
+		 * game will be run. It creates the box and the shows it to the user when the user clicks new game
+		 */
+		public TwoPlayerDialogBox() {
+			DialogPane dPane = new DialogPane();
+			
+			dPane.setMinHeight(130);
+			dPane.setMinWidth(260);
+			
+			Alert dialog = new Alert(AlertType.NONE);
+			dialog.initModality(Modality.APPLICATION_MODAL);
+			dialog.initStyle(StageStyle.UTILITY);
+			dialog.setTitle("Network Setup");
+			
+			createGroup = new ToggleGroup();
+			
+			RadioButton serverRadio = new RadioButton("Server");
+			serverRadio.setSelected(true);
+			serverRadio.setMinWidth(70);
+			serverRadio.setToggleGroup(createGroup);
+			
+			RadioButton clientRadio = new RadioButton("Client");
+			clientRadio.setMinWidth(70);
+			clientRadio.setToggleGroup(createGroup);
+			
+			playAsGroup = new ToggleGroup();
+			
+			Text createText = new Text("   Create: ");
+			Text serverText = new Text("   Server");
+			Text portText = new Text("Port");
+			
+			serverField = new TextField("localhost");
+			// default address = localhost
+			serverField.setText("localhost");
+			serverField.setMinWidth(90);
+			
+			portField = new TextField("4000");
+			// default port = 4000
+			portField.setText("4000");
+			portField.setMinWidth(90);
+			
+			HBox createBox = new HBox(10);
+			
+			createBox.getChildren().addAll(createText, serverRadio, clientRadio);
+			
+			HBox serverPortBox = new HBox(10);
+			serverPortBox.getChildren().addAll(serverText, serverField, portText, portField);
+			
+			VBox holder = new VBox(10);
+			holder.getChildren().addAll(createBox, serverPortBox);
+			
+			
+			dPane.getChildren().addAll(holder);
+			dialog.setDialogPane(dPane);
+			
+			ButtonType ok = new ButtonType("OK");
+			ButtonType cancel = new ButtonType("Cancel");
+			dialog.getButtonTypes().addAll(ok, cancel);
+			
+			dialog.showAndWait();
+		}
+		
+		/**
+		 * This method returns the port selected by the use. Default of 4000
+		 * 
+		 * @return An int representing the port to run the game on
+		 */
+		public int getPort() {
+			return  Integer.parseInt(portField.getText());
+		}
+		
+		/**
+		 * This method returns the address of the server. default of localhost
+		 * 
+		 * @return A string of the address of the server
+		 */
+		public String getAddress() {
+			return serverField.getText();
+			
+		}
+		
+		/**
+		 * This method returns a boolean indicating if the game is run by human or computer.
+		 * true = human, false = computer
+		 * 
+		 * @return A boolean indicating how the game will be run (computer or human)
+		 */
+		public boolean playAs() {
+			if(this.playAsGroup.getSelectedToggle().toString().contains("Human")) {
+				return true;
+			}
+			return false;
+		}
+		
+		/**
+		 * This method returns a boolean indicating if the current instance is a server
+		 * or a client
+		 * 
+		 * @return A boolean indicating if the instance is a server or client
+		 */
+		public boolean createType() {
+			if(this.createGroup.getSelectedToggle().toString().contains("Server")) {
+				return false;
+			}
+			return true;
+		}
+	}
+
+	
 
 	private TowerDefenseModel model;
 	private TowerDefenseController controller;
+	private BorderPane border;
 	private Tower currTowerClicked = null;
 	private GridPane grid;
 	private VBox sideBar;
@@ -40,7 +175,7 @@ public class TowerDefenseView extends Application implements Observer {
 	private Text money;
 	private Text lives;
 	private boolean isSelling = false;
-
+	
 	
 	
 	@Override
@@ -51,26 +186,57 @@ public class TowerDefenseView extends Application implements Observer {
 		
 		stage.setTitle("Rick and Morty Tower Defense");
 		
-		BorderPane border = new BorderPane();
+		border = new BorderPane();
+		Rectangle mainMenu = new Rectangle();
+		mainMenu.setWidth(1000);
+		mainMenu.setHeight(711);
+		mainMenu.setOnMouseClicked((event) -> {
+			if (event.getX() > 45 && event.getX() < 380 && event.getY() > 350 && event.getY() < 411) {
+				startGame();
+			}
+			else if (event.getX() > 40 && event.getX() < 336 && event.getY() > 455 && event.getY() < 520 ) {
+				TwoPlayerDialogBox dialogBox = new TwoPlayerDialogBox();
+			}
+		});
+		Image titleScreen = new Image("pictures/titleScreen.png");
+		mainMenu.setFill(new ImagePattern(titleScreen));
+		border.setCenter(mainMenu);
 		
+		
+
+		// right bar (width): 295px
+		// map (width): 705px
+		Scene scene = new Scene(border, 1000, 711);
+		stage.setScene(scene);
+		stage.show();
+		//playGame();
+	}
+	
+	public void startGame() {
 		//Creates side bar
 		sideBar = new VBox();
 		sideBar.setMinHeight(600);
 		sideBar.setMinWidth(295);
+		Rectangle defaultPanel = new Rectangle();
+		defaultPanel.setWidth(295);
+		defaultPanel.setHeight(600);
+		Image defaultPanelPic = new Image("pictures/defaultPanel.png");
+		defaultPanel.setFill(new ImagePattern(defaultPanelPic));
+		sideBar.getChildren().add(defaultPanel);
 		sideBar.setStyle("-fx-border-color: black;\n"
-                + "-fx-border-width: 6;\n");
+		              + "-fx-border-width: 6;\n");
 		border.setRight(sideBar);
-		
+				
 		towerText = new Rectangle();
 		towerText.setWidth(295);
 		towerText.setHeight(100);
 		towerText.setFill(Color.BLACK);
-		
-		
+			
+			
 		//Creates tower panels
 		towerBox = new HBox();
 		towerBox.setMaxWidth(705);
-		
+			
 		VBox moneyLivesBox = new VBox();
 		moneyLivesBox.setStyle("-fx-background-image: url(\"pictures/moneyLivesBackground.png\")");
 		moneyLivesBox.setPadding(new Insets(5, 0, 0, 25));
@@ -84,7 +250,7 @@ public class TowerDefenseView extends Application implements Observer {
 		lives.setFont(Font.font ("Verdana", 23));
 		lives.setFill(Color.YELLOW);
 		moneyLivesBox.getChildren().addAll(lives, money);
-		
+				
 		//sell button
 		Rectangle sellButton = new Rectangle();
 		sellButton.setWidth(60);
@@ -100,7 +266,7 @@ public class TowerDefenseView extends Application implements Observer {
 			}
 		});
 		moneyLivesBox.getChildren().add(sellButton);
-		
+				
 		VBox rickTowerBox = new VBox();
 		rickTowerBox.setMinWidth(100);
 		rickTowerBox.setMinHeight(100);
@@ -114,7 +280,7 @@ public class TowerDefenseView extends Application implements Observer {
 			currTowerClicked = new RickTower();
 			setPortrait();
 		});
-		
+			
 		VBox mortyTowerBox = new VBox();
 		mortyTowerBox.setMinWidth(100);
 		mortyTowerBox.setMinHeight(100);
@@ -128,7 +294,7 @@ public class TowerDefenseView extends Application implements Observer {
 			currTowerClicked = new MortyTower();
 			setPortrait();
 		});
-		
+				
 		VBox meeseeksTowerBox = new VBox();
 		meeseeksTowerBox.setMinWidth(100);
 		meeseeksTowerBox.setMinHeight(100);
@@ -142,7 +308,7 @@ public class TowerDefenseView extends Application implements Observer {
 			currTowerClicked = new MeeseeksTower();
 			setPortrait();
 		});
-		
+			
 		VBox jerryTowerBox = new VBox();
 		jerryTowerBox.setMinWidth(100);
 		jerryTowerBox.setMinHeight(100);
@@ -156,7 +322,7 @@ public class TowerDefenseView extends Application implements Observer {
 			currTowerClicked = new JerryTower();
 			setPortrait();
 		});
-		
+			
 		VBox birdpersonTowerBox = new VBox();
 		birdpersonTowerBox.setMinWidth(100);
 		birdpersonTowerBox.setMinHeight(100);
@@ -167,10 +333,10 @@ public class TowerDefenseView extends Application implements Observer {
 		birdpersonPanel.setFill(new ImagePattern(birdpersonPanelImg));
 		birdpersonTowerBox.getChildren().add(birdpersonPanel);
 		birdpersonTowerBox.setOnMouseClicked((event) -> {
-			currTowerClicked = new BirdPersonTower();
-			setPortrait();
+		currTowerClicked = new BirdPersonTower();
+		setPortrait();
 		});
-		
+			
 		VBox squanchyTowerBox = new VBox();
 		squanchyTowerBox.setMinWidth(100);
 		squanchyTowerBox.setMinHeight(100);
@@ -184,14 +350,14 @@ public class TowerDefenseView extends Application implements Observer {
 			currTowerClicked = new SquanchyTower();
 			setPortrait();
 		});
-		
+			
 		towerBox.getChildren().addAll(moneyLivesBox, rickTowerBox, mortyTowerBox,
-									  meeseeksTowerBox, jerryTowerBox, 
-									  birdpersonTowerBox, squanchyTowerBox, towerText);
-		
+									meeseeksTowerBox, jerryTowerBox, 
+									birdpersonTowerBox, squanchyTowerBox, towerText);
+			
 		border.setBottom(towerBox);
-		
-		
+				
+				
 		//Creates map
 		grid = new GridPane();
 		int[][] currMap = controller.getRoad().getMap();
@@ -222,22 +388,24 @@ public class TowerDefenseView extends Application implements Observer {
 					Image pic = new Image("/pictures/portal.png");
 					temp.setFill(new ImagePattern(pic));
 				} else if (currMap[i][j] == 3) {
-					temp.setFill(Paint.valueOf("purple"));
+					Image pause = new Image("pictures/pauseButton.png");
+					temp.setFill(new ImagePattern(pause));
 					temp.setOnMouseClicked(e -> {
 						if (controller.getGamePhase().equals("attack")) {
 							controller.changePaused();
 						}
 					});
 				} else if (currMap[i][j] == 4){
-					temp.setFill(Paint.valueOf("red"));
+					Image play = new Image("pictures/playButton.png");
+					temp.setFill(new ImagePattern(play));
 					temp.setOnMouseClicked(e -> {
 						if (controller.getGamePhase().equals("place")) {
 							controller.startRound();
 						}
-
 					});
 				} else {
-					temp.setFill(Paint.valueOf("pink"));
+					Image fastForward = new Image("pictures/fastForwardButton.png");
+					temp.setFill(new ImagePattern(fastForward));
 					temp.setOnMouseClicked(e -> {
 						if (controller.getGamePhase().equals("attack")) {
 							controller.increaseGameSpeed();
@@ -248,13 +416,6 @@ public class TowerDefenseView extends Application implements Observer {
 			}
 		}
 		border.setCenter(grid);
-
-		// right bar (width): 295px
-		// map (width): 705px
-		Scene scene = new Scene(border, 1000, 711);
-		stage.setScene(scene);
-		stage.show();
-		//playGame();
 	}
 	
 	public void setPortrait() {
@@ -331,7 +492,8 @@ public class TowerDefenseView extends Application implements Observer {
 						for (int k = 0; k < enemies.size(); k++) {
 							Enemy currEnemy = enemies.get(k);
 							if (i == currEnemy.getX() && j == currEnemy.getY() && currEnemy.getAlive()) {
-								curr.setFill(Paint.valueOf(currEnemy.getTowerPic()));
+								Image enemyPic = new Image(currEnemy.getTowerPic());
+								curr.setFill(new ImagePattern(enemyPic));
 								found = true;
 								break;
 							}

@@ -1,10 +1,10 @@
 
-public class TinyRickEnemy extends Enemy {
+public class GuardRickEnemy extends Enemy {
 
-	public TinyRickEnemy() {
+	public GuardRickEnemy() {
 		super();
-		this.towerName = "TinyRick";
-		this.towerPic = "yellow";
+		this.towerName = "GuardRick";
+		this.towerPic = "pictures/guardRick.png";
 		//this.towerPortrait = "PathToPortrait";
 		
 	}
