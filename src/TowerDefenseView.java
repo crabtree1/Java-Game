@@ -176,8 +176,6 @@ public class TowerDefenseView extends Application implements Observer {
 	private Text lives;
 	private boolean isSelling = false;
 	
-	
-	
 	@Override
 	public void start(Stage stage) throws Exception {
 		model = new TowerDefenseModel();
@@ -192,7 +190,17 @@ public class TowerDefenseView extends Application implements Observer {
 		mainMenu.setHeight(711);
 		mainMenu.setOnMouseClicked((event) -> {
 			if (event.getX() > 45 && event.getX() < 380 && event.getY() > 350 && event.getY() < 411) {
-				startGame();
+				Image mapSelection = new Image("pictures/mapSelection.png");
+				mainMenu.setFill(new ImagePattern(mapSelection));
+				mainMenu.setOnMouseClicked((event2) -> {
+					if (event2.getX() > 75 && event2.getX() < 453 && event2.getY() > 100 && event2.getY() < 611) {
+						controller.setRoad(new Road1());
+					}
+					else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
+						controller.setRoad(new Road2());
+					}
+					startGame();
+				});
 			}
 			else if (event.getX() > 40 && event.getX() < 336 && event.getY() > 455 && event.getY() < 520 ) {
 				TwoPlayerDialogBox dialogBox = new TwoPlayerDialogBox();

@@ -20,7 +20,10 @@ public class TowerDefenseModel extends Observable{
 		
 		towerMap = new Tower[13][15];
 		enemyMap = new ArrayList<Enemy>();
-		road = new Road1();
+	}
+	
+	public void setRoad(Road currRoad) {
+		road = currRoad;
 		pathToFollow = road.getPath();
 	}
 	
@@ -189,7 +192,7 @@ public class TowerDefenseModel extends Observable{
 						int temp = currEnemy.getHealth();
 						if (towerMap[i][j] instanceof BirdPersonTower) {
 							currEnemy.takeDamage(1);
-							System.out.println(currEnemy.getHealth());
+							//System.out.println(currEnemy.getHealth());
 						} else if (currEnemy.getX() == i + 1 && currEnemy.getY() == j || //below
 							currEnemy.getX() == i - 1 && currEnemy.getY() == j || // above
 							currEnemy.getX() == i + 1 && currEnemy.getY() == j + 1 || // lower right diagonal
@@ -218,7 +221,7 @@ public class TowerDefenseModel extends Observable{
 									currEnemy.takeDamage(towerMap[i][j].attackPower * 2);
 								} else {
 									currEnemy.takeDamage(towerMap[i][j].attackPower);
-									System.out.println(currEnemy.getHealth());
+									//System.out.println(currEnemy.getHealth());
 								}
 						}
 						if((currEnemy.getHealth() < temp) && (currEnemy.getHealth() != 0)) {

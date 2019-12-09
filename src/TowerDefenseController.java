@@ -16,6 +16,10 @@ public class TowerDefenseController {
 		return model;
 	}
 	
+	public void setRoad(Road currRoad) {
+		model.setRoad(currRoad);
+	}
+	
 	public Road getRoad() {
 		return model.getRoad();
 	}
