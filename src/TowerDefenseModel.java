@@ -8,11 +8,13 @@ public class TowerDefenseModel extends Observable{
 	private Road road;
 	private int health = 100;
 	private int money = 100;
-	private int gameSpeed = 100;
+	private int gameSpeed = 120;
 	private boolean paused = false;
 	private String gamePhase;
 	private int roundEnemies;
 	private int[][] pathToFollow;
+	private Integer round = 1;
+	private int probability = 1;
 	
 	public TowerDefenseModel() {
 		roundEnemies = 40;
@@ -20,6 +22,10 @@ public class TowerDefenseModel extends Observable{
 		
 		towerMap = new Tower[13][15];
 		enemyMap = new ArrayList<Enemy>();
+	}
+	
+	public Integer getRound(){
+		return this.round;
 	}
 	
 	public void setRoad(Road currRoad) {
@@ -32,8 +38,8 @@ public class TowerDefenseModel extends Observable{
 	}
 	
 	public void increaseGameSpeed() {
-		if(this.gameSpeed == 20) {
-			this.gameSpeed = 100;
+		if(this.gameSpeed == 40) {
+			this.gameSpeed = 120;
 		} else {
 			this.gameSpeed -= 40;
 		}
@@ -50,13 +56,14 @@ public class TowerDefenseModel extends Observable{
 				int i = 0;
 				while(i < roundEnemies || enemyMap.size() != 0) {
 					if(getHealth() < 0) {
+						enemyMap = new ArrayList<Enemy>();
 						break;
 					}
-					int speedToSleep = 10;
+					int speedToSleep = 40;
 					if (!paused) {
 						moveEnemies();
 						int createProb = (int) (Math.random() * 4);
-						if (createProb < 1 && i < roundEnemies) {
+						if (createProb < probability && i < roundEnemies) {
 							int randomEnemy = ((int) (Math.random() * 5)) + 1;
 							createEnemy(randomEnemy);
 							i += 1;
@@ -71,11 +78,15 @@ public class TowerDefenseModel extends Observable{
 					}
 				}
 				gamePhase = "place";
+				round += 1;
+				roundEnemies += 10;
+				probability += 1;
+				setChanged();
+				notifyObservers(null);
 			}
 		};
 		thread.start();
 	}
-	
 	
 	public void createEnemy(int randomEnemy) {
 		if(health < 0) {
@@ -94,20 +105,23 @@ public class TowerDefenseModel extends Observable{
 			enemy = new GuardRickEnemy();
 		}
 		
-		enemy.setCords(0, 13);
+		
+		enemy.setCords(road.getStartingPos()[0], road.getStartingPos()[1]);
 		enemyMap.add(enemy);
 	}
 	
 	public void moveEnemies() {
-		for (int i = 0; i < enemyMap.size(); i++) {
-			Enemy e = enemyMap.get(i);
-			if (e.getAlive()) {
-				findNext(e);
+		if (health > 0) {
+			for (int i = 0; i < enemyMap.size(); i++) {
+				Enemy e = enemyMap.get(i);
+				if (e.getAlive()) {
+					findNext(e);
+				}
 			}
+			
+			setChanged();
+			notifyObservers(enemyMap);
 		}
-		
-		setChanged();
-		notifyObservers(enemyMap);
 	}
 	
 	public void findNext(Enemy e) {
@@ -123,6 +137,16 @@ public class TowerDefenseModel extends Observable{
 		}
 		enemyMap.remove(e);
 	}
+	
+	/*
+	public void printPath() {
+		for (int i = 0; i < pathToFollow.length; i++) {
+			for (int j = 0; j < pathToFollow[i].length; j++) {
+				System.out.print(pathToFollow[i][j] + ",");
+			}
+			System.out.println();
+		}
+	}*/
 	
 	public Road getRoad() {
 		return road;
@@ -229,6 +253,7 @@ public class TowerDefenseModel extends Observable{
 						}
 						if (currEnemy.getHealth() <= 0) {
 							currEnemy.setAlive(false);
+							enemyMap.remove(currEnemy);
 						}
 					}
 				}

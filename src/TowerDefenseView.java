@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -175,9 +176,12 @@ public class TowerDefenseView extends Application implements Observer {
 	private Text money;
 	private Text lives;
 	private boolean isSelling = false;
+	private Stage stage;
+	private Text roundLabel;
 	
 	@Override
 	public void start(Stage stage) throws Exception {
+		this.stage = stage;
 		model = new TowerDefenseModel();
 		controller = new TowerDefenseController(model);
 		model.addObserver(this);
@@ -217,7 +221,6 @@ public class TowerDefenseView extends Application implements Observer {
 		Scene scene = new Scene(border, 1000, 711);
 		stage.setScene(scene);
 		stage.show();
-		//playGame();
 	}
 	
 	public void startGame() {
@@ -379,7 +382,10 @@ public class TowerDefenseView extends Application implements Observer {
 						Image pic = new Image("/pictures/space.png");
 						temp.setFill(new ImagePattern(pic));
 					} else {
-						controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY());
+						if (currTowerClicked != null) {
+							controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY());
+						}
+						
 					}
 				});
 				temp.setWidth(47);
@@ -408,6 +414,7 @@ public class TowerDefenseView extends Application implements Observer {
 					temp.setFill(new ImagePattern(play));
 					temp.setOnMouseClicked(e -> {
 						if (controller.getGamePhase().equals("place")) {
+							
 							controller.startRound();
 						}
 					});
@@ -424,6 +431,13 @@ public class TowerDefenseView extends Application implements Observer {
 			}
 		}
 		border.setCenter(grid);
+		
+
+		roundLabel = new Text("Round 1");
+		HBox hbox = new HBox();
+		hbox.setAlignment(Pos.CENTER);
+		hbox.getChildren().add(roundLabel);
+		border.setTop(hbox);
 	}
 	
 	public void setPortrait() {
@@ -461,10 +475,29 @@ public class TowerDefenseView extends Application implements Observer {
 		Optional<ButtonType> option = lossAlert.showAndWait();
 		
 		if(option.get() == newGame) {
-			TowerDefenseModel model = new TowerDefenseModel();
-			this.controller.setModel(model);
-			model.addObserver(this);
-			update(model, this);
+			try {
+				start(stage);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	private void showWin() {
+		Alert winAlert = new Alert(AlertType.INFORMATION);
+		winAlert.setHeaderText("Winner!");
+		winAlert.setContentText("You Win! New Game?");
+		ButtonType newGame = new ButtonType("NewGame");
+		winAlert.getButtonTypes().add(newGame);
+		Optional<ButtonType> option = winAlert.showAndWait();
+		
+		if(option.get() == newGame) {
+			try {
+				start(stage);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 	}
@@ -472,12 +505,25 @@ public class TowerDefenseView extends Application implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 		if (controller.getGamePhase().equals("place")) {
-			money.setText(Integer.toString(this.controller.getMoney()));
-			int[] coords = (int[]) arg;
-			Rectangle curr = findNode(coords[0], coords[1]);
-			Image pic = new Image(currTowerClicked.getTowerPic());
-	        curr.setFill(new ImagePattern(pic));
-
+			if (arg == null) {
+				if (controller.getRound() == 3) {
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							showWin();
+						}
+					});
+					return;
+				}
+				String string = "Round " + Integer.toString(controller.getRound());
+				roundLabel.setText(string);
+			}else {
+				money.setText(Integer.toString(this.controller.getMoney()));
+				int[] coords = (int[]) arg;
+				Rectangle curr = findNode(coords[0], coords[1]);
+				Image pic = new Image(currTowerClicked.getTowerPic());
+		        curr.setFill(new ImagePattern(pic));
+			}
 		} else {
 			if(this.controller.getHealth() <= 0) {
 				lives.setText("0");
@@ -492,6 +538,7 @@ public class TowerDefenseView extends Application implements Observer {
 			}
 			ArrayList<Enemy> enemies = (ArrayList<Enemy>) arg;
 			int[][] currMap = controller.getRoad().getMap();
+			this.controller.towerAttack();
 			for (int i = 0; i < currMap.length; i++) {
 				for (int j = 0; j < currMap[i].length; j++) {
 					boolean found  = false;
@@ -514,9 +561,7 @@ public class TowerDefenseView extends Application implements Observer {
 
 				}
 			}
-			this.controller.towerAttack();
 			money.setText(Integer.toString(this.controller.getMoney()));
-
 			/*
 			Tower[][] towers = controller.getTowerMap();
 			for (int i = 0; i < towers.length; i ++) {

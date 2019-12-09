@@ -39,6 +39,9 @@ public class Road2 extends Road {
 				{7,5},{7,4},{8,4},{9,4},{9,3},{9,2},{8,2},{7,2},{7,1},{7,0}};
 		
 		path = temp;
+		
+		int[] temp2 = {5,0};
+		super.startingPos = temp2;
 	}
 	
 	public int getValAtPos(int row, int col) {
