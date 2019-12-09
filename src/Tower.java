@@ -12,6 +12,7 @@ public class Tower {
 	public Tower() {
 		this.x = 0;
 		this.y = 0;
+		this.attackPower = 1;
 	}
 	
 	public void setX(int x) {
