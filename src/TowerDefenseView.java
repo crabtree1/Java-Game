@@ -34,7 +34,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class TowerDefenseView extends Application implements Observer {
-
 	
 
 	private TowerDefenseModel model;
@@ -247,20 +246,16 @@ public class TowerDefenseView extends Application implements Observer {
 		for (int i = 0; i < currMap.length; i++) {
 			for (int j = 0; j < currMap[i].length; j++) {
 				Rectangle temp = new Rectangle();
-				if(!controller.getTurn()) {
-					temp.setOnMouseClicked((event) -> {});
-				} else {
-					temp.setOnMouseClicked((event) -> {
-						if(this.isSelling) {
-							this.controller.sellTower(event.getSceneX(), event.getSceneY());
-							this.isSelling = false;
-							Image pic = new Image("/pictures/space.png");
-							temp.setFill(new ImagePattern(pic));
-						} else {
-							controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY());
-						}
-					});
-				}
+				temp.setOnMouseClicked((event) -> {
+					if(this.isSelling) {
+						this.controller.sellTower(event.getSceneX(), event.getSceneY());
+						this.isSelling = false;
+						Image pic = new Image("/pictures/space.png");
+						temp.setFill(new ImagePattern(pic));
+					} else {
+						controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY());
+					}
+				});
 				temp.setWidth(47);
 				temp.setHeight(47);
 				if (currMap[i][j] == 0) {
@@ -312,7 +307,6 @@ public class TowerDefenseView extends Application implements Observer {
 				ServerSocket server = new ServerSocket(this.dialogBox.getPort());
 				socket = server.accept();
 				server.close();
-				controller.setTurn(true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -323,9 +317,11 @@ public class TowerDefenseView extends Application implements Observer {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			controller.startListening();
 		}
 		this.controller.initStreams(socket);
+		if(dialogBox.createType()) {
+			controller.startListening();
+		}
 	}
 	
 	public void setPortrait() {
@@ -377,9 +373,13 @@ public class TowerDefenseView extends Application implements Observer {
 			money.setText(Integer.toString(this.controller.getMoney()));
 			int[] coords = (int[]) arg;
 			Rectangle curr = findNode(coords[0], coords[1]);
-			Image pic = new Image(currTowerClicked.getTowerPic());
+			Image pic;
+			if(!controller.getTurn()) {
+				pic = controller.getCurTower();
+			} else {
+				pic = new Image(currTowerClicked.getTowerPic());
+			}
 	        curr.setFill(new ImagePattern(pic));
-
 		} else {
 			if(this.controller.getHealth() <= 0) {
 				lives.setText("0");

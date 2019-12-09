@@ -1,8 +1,10 @@
 import java.io.Serializable;
 
-public class Tower implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+public class Tower {
+	
+	public static final int type = -1;
+
 	protected String towerPic;
 	protected String towerPortrait;
 	protected String towerName;

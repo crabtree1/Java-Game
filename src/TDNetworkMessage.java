@@ -5,12 +5,12 @@ public class TDNetworkMessage implements Serializable {
 
 	       private int row;
 	       private int col;
-	       private Tower curTower;
+	       private int towerType;
 
-	       public TDNetworkMessage(int row, int col, Tower tower) {
+	       public TDNetworkMessage(int row, int col, int towerType) {
 	    	   this.row = row;
 	    	   this.col = col;
-	    	   this.curTower = tower;
+	    	   this.towerType = towerType;
 	       }
 
 	       /**
@@ -31,7 +31,7 @@ public class TDNetworkMessage implements Serializable {
 	    	   return col;
 	       }
 
-	       public Tower getTower() {
-	    	   return this.curTower;
+	       public int getTower() {
+	    	   return this.towerType;
 	       }
 }
