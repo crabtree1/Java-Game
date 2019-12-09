@@ -232,4 +232,26 @@ public class TowerDefenseModel extends Observable{
 			}
 		}
 	}
+	
+	// getters/setters to help with testing
+	public void setMoney(int amount) {
+		this.money = amount;
+	}
+	
+	public int getGameSpeed() {
+		return this.gameSpeed;
+	}
+	
+	public boolean getPaused() {
+		return this.paused;
+	}
+	
+	public ArrayList<Enemy> getEnemies() {
+		return this.enemyMap;
+	}
+	
+	public void setHealth(int amount) {
+		this.health = amount;
+	}
+	
 }

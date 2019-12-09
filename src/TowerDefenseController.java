@@ -12,6 +12,10 @@ public class TowerDefenseController {
 		this.model = model;
 	}
 	
+	public TowerDefenseModel getModel() {
+		return model;
+	}
+	
 	public Road getRoad() {
 		return model.getRoad();
 	}
@@ -25,7 +29,7 @@ public class TowerDefenseController {
 	}
 	
 	public void addTower(Tower currTowerClicked, double mouseX, double mouseY) {
-		if((this.getMoney() - currTowerClicked.getCost()) < 0) {
+		if((getMoney() - currTowerClicked.getCost()) < 0) {
 			return;
 		}
 		int row = 0;

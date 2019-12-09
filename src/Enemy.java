@@ -65,5 +65,4 @@ public class Enemy {
 	public boolean getAlive() {
 		return this.alive;
 	}
-
 }
