@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -10,12 +13,12 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -31,136 +34,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class TowerDefenseView extends Application implements Observer {
-	
-	private class TwoPlayerDialogBox extends Stage {
-		/**
-		 * Holds the data to select if it is a server or client
-		 */
-		private ToggleGroup createGroup;
-		
-		/**
-		 * Holds the port selected by the user; default 4000
-		 */
-		private TextField portField;
-		
-		/**
-		 * Holds the data to select if the game is played by a human or computer
-		 */
-		private ToggleGroup playAsGroup;
-		
-		/**
-		 * Holds the address of the server; default localhost
-		 */
-		private TextField serverField;
-		
-		/**
-		 * This is the constructor of the dialog box used by the user to select options about the
-		 * game will be run. It creates the box and the shows it to the user when the user clicks new game
-		 */
-		public TwoPlayerDialogBox() {
-			DialogPane dPane = new DialogPane();
-			
-			dPane.setMinHeight(130);
-			dPane.setMinWidth(260);
-			
-			Alert dialog = new Alert(AlertType.NONE);
-			dialog.initModality(Modality.APPLICATION_MODAL);
-			dialog.initStyle(StageStyle.UTILITY);
-			dialog.setTitle("Network Setup");
-			
-			createGroup = new ToggleGroup();
-			
-			RadioButton serverRadio = new RadioButton("Server");
-			serverRadio.setSelected(true);
-			serverRadio.setMinWidth(70);
-			serverRadio.setToggleGroup(createGroup);
-			
-			RadioButton clientRadio = new RadioButton("Client");
-			clientRadio.setMinWidth(70);
-			clientRadio.setToggleGroup(createGroup);
-			
-			playAsGroup = new ToggleGroup();
-			
-			Text createText = new Text("   Create: ");
-			Text serverText = new Text("   Server");
-			Text portText = new Text("Port");
-			
-			serverField = new TextField("localhost");
-			// default address = localhost
-			serverField.setText("localhost");
-			serverField.setMinWidth(90);
-			
-			portField = new TextField("4000");
-			// default port = 4000
-			portField.setText("4000");
-			portField.setMinWidth(90);
-			
-			HBox createBox = new HBox(10);
-			
-			createBox.getChildren().addAll(createText, serverRadio, clientRadio);
-			
-			HBox serverPortBox = new HBox(10);
-			serverPortBox.getChildren().addAll(serverText, serverField, portText, portField);
-			
-			VBox holder = new VBox(10);
-			holder.getChildren().addAll(createBox, serverPortBox);
-			
-			
-			dPane.getChildren().addAll(holder);
-			dialog.setDialogPane(dPane);
-			
-			ButtonType ok = new ButtonType("OK");
-			ButtonType cancel = new ButtonType("Cancel");
-			dialog.getButtonTypes().addAll(ok, cancel);
-			
-			dialog.showAndWait();
-		}
-		
-		/**
-		 * This method returns the port selected by the use. Default of 4000
-		 * 
-		 * @return An int representing the port to run the game on
-		 */
-		public int getPort() {
-			return  Integer.parseInt(portField.getText());
-		}
-		
-		/**
-		 * This method returns the address of the server. default of localhost
-		 * 
-		 * @return A string of the address of the server
-		 */
-		public String getAddress() {
-			return serverField.getText();
-			
-		}
-		
-		/**
-		 * This method returns a boolean indicating if the game is run by human or computer.
-		 * true = human, false = computer
-		 * 
-		 * @return A boolean indicating how the game will be run (computer or human)
-		 */
-		public boolean playAs() {
-			if(this.playAsGroup.getSelectedToggle().toString().contains("Human")) {
-				return true;
-			}
-			return false;
-		}
-		
-		/**
-		 * This method returns a boolean indicating if the current instance is a server
-		 * or a client
-		 * 
-		 * @return A boolean indicating if the instance is a server or client
-		 */
-		public boolean createType() {
-			if(this.createGroup.getSelectedToggle().toString().contains("Server")) {
-				return false;
-			}
-			return true;
-		}
-	}
 
 	
 
@@ -175,6 +48,8 @@ public class TowerDefenseView extends Application implements Observer {
 	private Text money;
 	private Text lives;
 	private boolean isSelling = false;
+	private boolean isMultiplayer = false;
+	TwoPlayerDialogBox dialogBox;
 	
 	
 	
@@ -195,7 +70,11 @@ public class TowerDefenseView extends Application implements Observer {
 				startGame();
 			}
 			else if (event.getX() > 40 && event.getX() < 336 && event.getY() > 455 && event.getY() < 520 ) {
-				TwoPlayerDialogBox dialogBox = new TwoPlayerDialogBox();
+				dialogBox = new TwoPlayerDialogBox();
+				setupNetwork();
+				isMultiplayer = true;
+				controller.setMulitplayer(isMultiplayer);
+				startGame();
 			}
 		});
 		Image titleScreen = new Image("pictures/titleScreen.png");
@@ -210,6 +89,10 @@ public class TowerDefenseView extends Application implements Observer {
 		stage.setScene(scene);
 		stage.show();
 		//playGame();
+		
+		//AudioInputStream aio = AudioSystem.getAudioInputStream(new File("intro.mp3"));
+		//Clip clip = AudioSystem.getClip();
+		//clip.start();
 	}
 	
 	public void startGame() {
@@ -364,16 +247,20 @@ public class TowerDefenseView extends Application implements Observer {
 		for (int i = 0; i < currMap.length; i++) {
 			for (int j = 0; j < currMap[i].length; j++) {
 				Rectangle temp = new Rectangle();
-				temp.setOnMouseClicked((event) -> {
-					if(this.isSelling) {
-						this.controller.sellTower(event.getSceneX(), event.getSceneY());
-						this.isSelling = false;
-						Image pic = new Image("/pictures/space.png");
-						temp.setFill(new ImagePattern(pic));
-					} else {
-						controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY());
-					}
-				});
+				if(!controller.getTurn()) {
+					temp.setOnMouseClicked((event) -> {});
+				} else {
+					temp.setOnMouseClicked((event) -> {
+						if(this.isSelling) {
+							this.controller.sellTower(event.getSceneX(), event.getSceneY());
+							this.isSelling = false;
+							Image pic = new Image("/pictures/space.png");
+							temp.setFill(new ImagePattern(pic));
+						} else {
+							controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY());
+						}
+					});
+				}
 				temp.setWidth(47);
 				temp.setHeight(47);
 				if (currMap[i][j] == 0) {
@@ -416,6 +303,29 @@ public class TowerDefenseView extends Application implements Observer {
 			}
 		}
 		border.setCenter(grid);
+	}
+	
+	public void setupNetwork() {
+		Socket socket = null;
+		if(!dialogBox.createType()) {
+			try {
+				ServerSocket server = new ServerSocket(this.dialogBox.getPort());
+				socket = server.accept();
+				server.close();
+				controller.setTurn(true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				socket = new Socket(this.dialogBox.getAddress(), this.dialogBox.getPort());
+				controller.setTurn(false);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			controller.startListening();
+		}
+		this.controller.initStreams(socket);
 	}
 	
 	public void setPortrait() {
@@ -541,6 +451,136 @@ public class TowerDefenseView extends Application implements Observer {
 				}
 			}
 			*/
+		}
+	}
+	
+	private class TwoPlayerDialogBox extends Stage {
+		/**
+		 * Holds the data to select if it is a server or client
+		 */
+		private ToggleGroup createGroup;
+		
+		/**
+		 * Holds the port selected by the user; default 4000
+		 */
+		private TextField portField;
+		
+		/**
+		 * Holds the data to select if the game is played by a human or computer
+		 */
+		private ToggleGroup playAsGroup;
+		
+		/**
+		 * Holds the address of the server; default localhost
+		 */
+		private TextField serverField;
+		
+		/**
+		 * This is the constructor of the dialog box used by the user to select options about the
+		 * game will be run. It creates the box and the shows it to the user when the user clicks new game
+		 */
+		public TwoPlayerDialogBox() {
+			DialogPane dPane = new DialogPane();
+			
+			dPane.setMinHeight(130);
+			dPane.setMinWidth(260);
+			
+			Alert dialog = new Alert(AlertType.NONE);
+			dialog.initModality(Modality.APPLICATION_MODAL);
+			dialog.initStyle(StageStyle.UTILITY);
+			dialog.setTitle("Network Setup");
+			
+			createGroup = new ToggleGroup();
+			
+			RadioButton serverRadio = new RadioButton("Server");
+			serverRadio.setSelected(true);
+			serverRadio.setMinWidth(70);
+			serverRadio.setToggleGroup(createGroup);
+			
+			RadioButton clientRadio = new RadioButton("Client");
+			clientRadio.setMinWidth(70);
+			clientRadio.setToggleGroup(createGroup);
+			
+			playAsGroup = new ToggleGroup();
+			
+			Text createText = new Text("   Create: ");
+			Text serverText = new Text("   Server");
+			Text portText = new Text("Port");
+			
+			serverField = new TextField("localhost");
+			// default address = localhost
+			serverField.setText("localhost");
+			serverField.setMinWidth(90);
+			
+			portField = new TextField("4000");
+			// default port = 4000
+			portField.setText("4000");
+			portField.setMinWidth(90);
+			
+			HBox createBox = new HBox(10);
+			
+			createBox.getChildren().addAll(createText, serverRadio, clientRadio);
+			
+			HBox serverPortBox = new HBox(10);
+			serverPortBox.getChildren().addAll(serverText, serverField, portText, portField);
+			
+			VBox holder = new VBox(10);
+			holder.getChildren().addAll(createBox, serverPortBox);
+			
+			
+			dPane.getChildren().addAll(holder);
+			dialog.setDialogPane(dPane);
+			
+			ButtonType ok = new ButtonType("OK");
+			ButtonType cancel = new ButtonType("Cancel");
+			dialog.getButtonTypes().addAll(ok, cancel);
+			
+			dialog.showAndWait();
+		}
+		
+		/**
+		 * This method returns the port selected by the use. Default of 4000
+		 * 
+		 * @return An int representing the port to run the game on
+		 */
+		public int getPort() {
+			return  Integer.parseInt(portField.getText());
+		}
+		
+		/**
+		 * This method returns the address of the server. default of localhost
+		 * 
+		 * @return A string of the address of the server
+		 */
+		public String getAddress() {
+			return serverField.getText();
+			
+		}
+		
+		/**
+		 * This method returns a boolean indicating if the game is run by human or computer.
+		 * true = human, false = computer
+		 * 
+		 * @return A boolean indicating how the game will be run (computer or human)
+		 */
+		public boolean playAs() {
+			if(this.playAsGroup.getSelectedToggle().toString().contains("Human")) {
+				return true;
+			}
+			return false;
+		}
+		
+		/**
+		 * This method returns a boolean indicating if the current instance is a server
+		 * or a client
+		 * 
+		 * @return A boolean indicating if the instance is a server or client
+		 */
+		public boolean createType() {
+			if(this.createGroup.getSelectedToggle().toString().contains("Server")) {
+				return false;
+			}
+			return true;
 		}
 	}
 }

@@ -1,6 +1,8 @@
+import java.io.Serializable;
 
-public class Tower {
-	
+public class Tower implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	protected String towerPic;
 	protected String towerPortrait;
 	protected String towerName;
