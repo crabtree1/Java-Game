@@ -598,33 +598,45 @@ public class TowerDefenseView extends Application implements Observer {
 			ArrayList<Enemy> enemies = (ArrayList<Enemy>) arg;
 			int[][] currMap = controller.getRoad().getMap();
 			this.controller.towerAttack();
-			
-			// ANIMATION
-			
+						
 			//FOR EACH TOWER
 			Tower[][] towerMap = controller.getTowerMap();
 			for (int i = 0; i < towerMap.length; i++) {
 				for (int j = 0; j < towerMap[i].length; j ++) {
 					// IF TOWER IS NOT EQUAL TO NULL
 					if (towerMap[i][j] != null) {
-						//System.out.println("(" + i + ", " + j + ")");
 						ArrayList<Enemy> enemiesList = towerMap[i][j].getEnemiesToAttack();
 						//SEARCH THROUGH ENEMIES NEXT TO CURRENT TOWER
-						//System.out.println(enemiesList.size());
 						for (int k = 0; k < enemiesList.size(); k++) {
-							//*animation part*
 							Rectangle test = new Rectangle();
 							test.setWidth(10);
 							test.setHeight(10);
-							test.setFill(Color.RED);
+							if (towerMap[i][j] instanceof RickTower) {
+								test.setFill(Color.GREENYELLOW);
+							}
+							else if (towerMap[i][j] instanceof JerryTower) {
+								test.setFill(Color.LIGHTSKYBLUE);
+							}
+							else if (towerMap[i][j] instanceof MortyTower) {
+								test.setFill(Color.RED);
+							}
+							else if (towerMap[i][j] instanceof MeeseeksTower) {
+								test.setFill(Color.SLATEBLUE);
+							}
+							else if (towerMap[i][j] instanceof SquanchyTower) {
+								test.setFill(Color.ORANGE);
+							}	
+							else if (towerMap[i][j] instanceof BirdPersonTower) {
+								test.setFill(Color.WHITE);
+							}	
 							Path path = new Path();
 							
 							//starting point
 							path.getElements().add(new MoveTo((towerMap[i][j].getX() * 47) + 23, (((towerMap[i][j].getY()) * 47) + 40)));
+							
 							//ending point
 							path.getElements().add(new LineTo((enemiesList.get(k).getY() * 47) + 23, ((enemiesList.get(k).getX() * 47)) + 40));
 							
-							//******DO NOT TOUCH************
 							PathTransition pathTransition = new PathTransition();
 							pathTransition.setDuration(Duration.millis(controller.getGameSpeed()));
 							pathTransition.setNode(test);
@@ -639,15 +651,12 @@ public class TowerDefenseView extends Application implements Observer {
 				                     border.getChildren().add(test);
 				                 }
 				             });
-							//***********************************
 						}
 						towerMap[i][j].clearEnemies();
 					}
 				}
 			}
-		
-			// ANIMATION
-			
+					
 			for (int i = 0; i < currMap.length; i++) {
 				for (int j = 0; j < currMap[i].length; j++) {
 					boolean found  = false;

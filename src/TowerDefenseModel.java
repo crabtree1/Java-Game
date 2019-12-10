@@ -322,8 +322,7 @@ public class TowerDefenseModel extends Observable{
 						hasEnemy = false;
 						if (towerMap[i][j] instanceof BirdPersonTower) {
 							currEnemy.takeDamage(1);
-							//System.out.println(currEnemy.getHealth());
-							
+							towerMap[i][j].addEnemy(currEnemy);
 						} 
 						//below
 						else if (currEnemy.getX() == i + 1 && currEnemy.getY() == j) {
