@@ -14,6 +14,7 @@ public class TowerDefenseController {
 	private TDNetworkMessage otherMessage;
 	private boolean isTurn = true;
 	private boolean isMultiplayer = false;
+	private boolean isClient = false;
 	private Image image = null;
 	
 	public TowerDefenseController(TowerDefenseModel model) {
@@ -164,6 +165,16 @@ public class TowerDefenseController {
 				row = i;
 			}
 		}
+		if(!isClient) {
+			if(col < 8) {
+				return;
+			}
+				
+		} else if (isClient) {
+			if(col > 7) {
+				return;
+			}
+		}
 		this.model.spendMoney(currTowerClicked.getCost());
 		model.addTower(currTowerClicked, row, col);
 		if(isMultiplayer) {
@@ -216,6 +227,10 @@ public class TowerDefenseController {
 	
 	public String getGamePhase() {
 		return model.getGamePhase();
+	}
+	
+	public void setIsClient(boolean isClient) {
+		this.isClient = isClient;
 	}
 	
 	public int getMoney() {

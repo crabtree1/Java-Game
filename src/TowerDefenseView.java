@@ -88,6 +88,7 @@ public class TowerDefenseView extends Application implements Observer {
 				setupNetwork();
 				isMultiplayer = true;
 				controller.setMulitplayer(isMultiplayer);
+				controller.setRoad(new Road1());
 				startGame();
 			}
 		});
@@ -338,6 +339,7 @@ public class TowerDefenseView extends Application implements Observer {
 			try {
 				socket = new Socket(this.dialogBox.getAddress(), this.dialogBox.getPort());
 				controller.setTurn(false);
+				controller.setIsClient(true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
