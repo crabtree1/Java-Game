@@ -314,6 +314,7 @@ public class TowerDefenseModel extends Observable{
 		//Tower[][] towers = controller.getTowerMap();
 		for (int i = 0; i < towerMap.length; i ++) {
 			for (int j = 0; j < towerMap[i].length; j ++) {
+				int enemiesHit = 0;
 				for (int k = 0; k < enemyMap.size(); k ++) {
 					Enemy currEnemy = enemyMap.get(k);
 					if (towerMap[i][j] != null) {						
@@ -366,6 +367,7 @@ public class TowerDefenseModel extends Observable{
 						}
 							
 						if (hasEnemy) {
+							enemiesHit ++;
 							//System.out.println(towers[i][j].attackPower);
 								
 							if (towerMap[i][j] instanceof MeeseeksTower) {
@@ -398,6 +400,11 @@ public class TowerDefenseModel extends Observable{
 							enemyMap.remove(currEnemy);
 
 						}
+					}
+					// if it is not a rick tower and the tower has attacked the farthest
+					// enemy ahead, break from the enemy loop
+					if (!(towerMap[i][j] instanceof RickTower) && enemiesHit == 1) {
+						break;
 					}
 				}
 			}
