@@ -9,6 +9,7 @@ public class TDNetworkMessage implements Serializable {
 	       private int mapSelection;
 	       private boolean isPlaying = false;
 	       private boolean isPaused = false;
+	       private boolean removeTower = false;
 
 	       public TDNetworkMessage(int row, int col, int towerType) {
 	    	   this.row = row;
@@ -48,6 +49,10 @@ public class TDNetworkMessage implements Serializable {
 	       public boolean isPuased() {
 	    	   return this.isPaused;
 	       }
+	       
+	       public boolean isRemoving() {
+	    	   return this.removeTower;
+	       }
 
 	       public int getTower() {
 	    	   return this.towerType;
@@ -63,5 +68,9 @@ public class TDNetworkMessage implements Serializable {
 	       
 	       public void setPaused(boolean isPaused) {
 	    	   this.isPaused = isPaused;
+	       }
+	       
+	       public void setRemove(boolean remove) {
+	    	   this.removeTower = remove;
 	       }
 }

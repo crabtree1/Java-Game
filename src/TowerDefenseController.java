@@ -75,6 +75,8 @@ public class TowerDefenseController {
 									startRound();
 								} else if(otherMessage.isPuased()) {
 									changePaused();
+								} else if(otherMessage.isRemoving()) {
+									model.removeTowerNetwork(otherMessage.getRow(), otherMessage.getColumn());
 								} else if(otherMessage.getTower() == 0) {
 									image = new Image(new BirdPersonTower().getTowerPic());
 									model.addTower(new BirdPersonTower(), otherMessage.getRow(), otherMessage.getColumn());
@@ -162,6 +164,14 @@ public class TowerDefenseController {
 		System.out.print("Here1");
 		try {
 			oos.writeObject(new TDNetworkMessage(true));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void sendEnimies() {
+		try {
+			oos.writeObject(model.getEnemies());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -265,7 +275,6 @@ public class TowerDefenseController {
 				e.printStackTrace();
 			}
 			this.isTurn = false;
-			//startListening();
 		}
 	}
 	
@@ -287,8 +296,28 @@ public class TowerDefenseController {
 				row = i;
 			}
 		}
+		if(!isClient && isMultiplayer) {
+			if(col < 8) {
+				return;
+			}
+				
+		} else if (isClient && isMultiplayer) {
+			if(col > 7) {
+				return;
+			}
+		}
 		if(this.model.towerAtPosition(row, col)) {
 			this.model.removeTower(this.model.getTowerAtPost(row, col), row, col);
+		}
+		if(isMultiplayer) {
+			try {
+				TDNetworkMessage temp = new TDNetworkMessage(row, col, curTowerType);
+				temp.setRemove(true);
+				oos.writeObject(temp);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			//this.isTurn = false;
 		}
 	}
 	

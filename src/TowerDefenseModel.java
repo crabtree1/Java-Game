@@ -186,6 +186,16 @@ public class TowerDefenseModel extends Observable{
 		notifyObservers(returnArray);
 	}
 	
+	public void removeTowerNetwork(int x, int y) {
+		System.out.print("Removing Via Network");
+		towerMap[x][y] = null;
+		//this.money += currTowerClicked.getCost()/2;
+		
+		int[] returnArray = {x, y};
+		setChanged();
+		notifyObservers(returnArray);
+	}
+	
 	public int getMoney() {
 		return this.money;
 	}
