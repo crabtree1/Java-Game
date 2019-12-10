@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 /**
  * Tower class that defines the base behavior for all of the tower classes. It contains
  * information for all of their graphic representations, x and y coordinates, cost, and
@@ -14,7 +15,8 @@ public class Tower {
 	private int x;
 	private int y;
 	protected int cost = 1;
-	protected int attackPower;
+	protected int attackPower = 0;
+	private ArrayList<ArrayList<Integer>> enemiesToAttack = new ArrayList<ArrayList<Integer>>();
 	
 	/**
 	 * Base constructor for the tower class
@@ -105,5 +107,20 @@ public class Tower {
 	 */
 	public int getAttackPower() {
 		return this.attackPower;
+	}
+	
+	public void addEnemy(int i, int j) {
+		ArrayList<Integer> curr = new ArrayList<Integer>();
+		curr.add(i);
+		curr.add(j);
+		enemiesToAttack.add(curr);
+	}
+	
+	public void clearEnemies() {
+		enemiesToAttack.clear();
+	}
+	
+	public ArrayList<ArrayList<Integer>> getEnemiesToAttack() {
+		return enemiesToAttack;
 	}
 }

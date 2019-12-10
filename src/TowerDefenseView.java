@@ -15,6 +15,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
 
+import javafx.animation.PathTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -36,12 +37,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 public class TowerDefenseView extends Application implements Observer {
 	
@@ -211,7 +216,7 @@ public class TowerDefenseView extends Application implements Observer {
 		border = new BorderPane();
 		Rectangle mainMenu = new Rectangle();
 		mainMenu.setWidth(1000);
-		mainMenu.setHeight(711);
+		mainMenu.setHeight(727);
 		mainMenu.setOnMouseClicked((event) -> {
 			if (event.getX() > 45 && event.getX() < 380 && event.getY() > 350 && event.getY() < 411) {
 				Image mapSelection = new Image("pictures/mapSelection.png");
@@ -236,7 +241,7 @@ public class TowerDefenseView extends Application implements Observer {
 
 		// right bar (width): 295px
 		// map (width): 705px
-		Scene scene = new Scene(border, 1000, 711);
+		Scene scene = new Scene(border, 1000, 727);
 		stage.setScene(scene);
 		stage.show();
 	}
@@ -593,6 +598,57 @@ public class TowerDefenseView extends Application implements Observer {
 			ArrayList<Enemy> enemies = (ArrayList<Enemy>) arg;
 			int[][] currMap = controller.getRoad().getMap();
 			this.controller.towerAttack();
+			
+			// ANIMATION
+			
+			//FOR EACH TOWER
+			Tower[][] towerMap = controller.getTowerMap();
+			for (int i = 0; i < towerMap.length; i++) {
+				for (int j = 0; j < towerMap[i].length; j ++) {
+					// IF TOWER IS NOT EQUAL TO NULL
+					if (towerMap[i][j] != null) {
+						//System.out.println("(" + i + ", " + j + ")");
+						ArrayList<ArrayList<Integer>> enemiesList = towerMap[i][j].getEnemiesToAttack();
+						//SEARCH THROUGH ENEMIES NEXT TO CURRENT TOWER
+						//System.out.println(enemiesList.size());
+						for (int k = 0; k < enemiesList.size(); k++) {
+							//*animation part*
+							Rectangle test = new Rectangle();
+							test.setWidth(5);
+							test.setHeight(5);
+							test.setFill(Color.RED);
+							Path path = new Path();
+							
+							//starting point
+							path.getElements().add(new MoveTo((towerMap[i][j].getX() * 47) + 23, (((towerMap[i][j].getY()) * 47) + 40)));
+							//ending point
+							//System.out.println(enemiesList.get(k));
+							path.getElements().add(new LineTo((enemiesList.get(k).get(1) * 47) + 23, ((enemiesList.get(k).get(0) * 47)) + 40));
+							
+							//******DO NOT TOUCH************
+							PathTransition pathTransition = new PathTransition();
+							pathTransition.setDuration(Duration.millis(500));
+							pathTransition.setNode(test);
+							pathTransition.setPath(path);
+							pathTransition.setOnFinished((eventTest) -> {
+								border.getChildren().remove(test);
+							});
+							pathTransition.play();
+
+							Platform.runLater(new Runnable() {
+				                 @Override public void run() {
+				                     border.getChildren().add(test);
+				                 }
+				             });
+							//***********************************
+						}
+						towerMap[i][j].clearEnemies();
+					}
+				}
+			}
+		
+			// ANIMATION
+			
 			for (int i = 0; i < currMap.length; i++) {
 				for (int j = 0; j < currMap[i].length; j++) {
 					boolean found  = false;

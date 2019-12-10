@@ -149,7 +149,7 @@ public class TowerDefenseModel extends Observable{
 		}
 		
 		
-		enemy.setCords(road.getStartingPos()[0], road.getStartingPos()[1]);
+		enemy.setCoords(road.getStartingPos()[0], road.getStartingPos()[1]);
 		enemyMap.add(enemy);
 	}
 	
@@ -181,7 +181,7 @@ public class TowerDefenseModel extends Observable{
 		int[] enemyCoords = {e.getX(), e.getY()};
 		for (int i = 0; i < pathToFollow.length - 1; i++) {
 			if (pathToFollow[i][0] == enemyCoords[0] && pathToFollow[i][1] == enemyCoords[1]) {
-				e.setCords(pathToFollow[i+1][0], pathToFollow[i+1][1]);
+				e.setCoords(pathToFollow[i+1][0], pathToFollow[i+1][1]);
 				return;
 			}
 		}
@@ -218,7 +218,7 @@ public class TowerDefenseModel extends Observable{
 	public void addTower(Tower currTowerClicked, int x, int y) {
 		if (currTowerClicked != null && towerMap[x][y] == null && road.getMap()[x][y] == 0 && gamePhase.equals("place")) {
 			towerMap[x][y] = currTowerClicked;
-			
+			currTowerClicked.setCords(y, x);
 			int[] returnArray = {x, y};
 			setChanged();
 			notifyObservers(returnArray);
@@ -310,58 +310,96 @@ public class TowerDefenseModel extends Observable{
 	 * if any enemies are touching the towers, and if they are, they are attacked.
 	 */
 	public void towerAttack() {
+    boolean hasEnemy;
+		//Tower[][] towers = controller.getTowerMap();
 		for (int i = 0; i < towerMap.length; i ++) {
 			for (int j = 0; j < towerMap[i].length; j ++) {
 				for (int k = 0; k < enemyMap.size(); k ++) {
 					Enemy currEnemy = enemyMap.get(k);
-					if (towerMap[i][j] != null) {
+					if (towerMap[i][j] != null) {						
 						int temp = currEnemy.getHealth();
-						// bird person attacks all people on the board no matter their location
+						hasEnemy = false;
 						if (towerMap[i][j] instanceof BirdPersonTower) {
 							currEnemy.takeDamage(1);
-						} else if (currEnemy.getX() == i + 1 && currEnemy.getY() == j || //below
-							currEnemy.getX() == i - 1 && currEnemy.getY() == j || // above
-							currEnemy.getX() == i + 1 && currEnemy.getY() == j + 1 || // lower right diagonal
-							currEnemy.getX() == i - 1 && currEnemy.getY() == j - 1 || // upper left diagonal
-							currEnemy.getX() == i - 1 && currEnemy.getY() == j + 1 || // upper right diagonal
-							currEnemy.getX() == i + 1 && currEnemy.getY() == j - 1 || // lower left diagonal
-							currEnemy.getX() == i && currEnemy.getY() == j - 1 || // left
-							currEnemy.getX() == i && currEnemy.getY() == j + 1) { // right
-								// meeseeks may do double damage
-								if (towerMap[i][j] instanceof MeeseeksTower) {
-									int damageMultiplier = (int) (Math.random() * 100);
-									if (damageMultiplier <= 50) {
-										currEnemy.takeDamage(towerMap[i][j].attackPower * 2);
-									} else {
-										currEnemy.takeDamage(towerMap[i][j].attackPower);
-									}
-								// squanchy may do quadruple damage
-								} else if (towerMap[i][j] instanceof SquanchyTower) {
-									int damageMultiplier = (int) (Math.random() * 100);
-									if (damageMultiplier <= 25) {
-										currEnemy.takeDamage(towerMap[i][j].attackPower * 4);
-									} else {
-										currEnemy.takeDamage(towerMap[i][j].attackPower);
-									}
-								// jerry does double damage to doofus rick
-								} else if (towerMap[i][j] instanceof JerryTower && currEnemy
-										instanceof DoofusRickEnemy) {
+							//System.out.println(currEnemy.getHealth());
+							
+						} 
+						//below
+						else if (currEnemy.getX() == i + 1 && currEnemy.getY() == j) {
+							towerMap[i][j].addEnemy(currEnemy);
+							hasEnemy = true;
+						}
+						//above
+						else if (currEnemy.getX() == i - 1 && currEnemy.getY() == j) {
+							towerMap[i][j].addEnemy(currEnemy);
+							hasEnemy = true;
+						}
+						// lower right diagonal
+						else if(currEnemy.getX() == i + 1 && currEnemy.getY() == j + 1) {
+							towerMap[i][j].addEnemy(currEnemy);
+							hasEnemy = true;
+						}
+						// upper left diagonal
+						else if(currEnemy.getX() == i - 1 && currEnemy.getY() == j - 1) {
+							towerMap[i][j].addEnemy(currEnemy);
+							hasEnemy = true;
+						}
+						// upper right diagonal
+						else if(currEnemy.getX() == i - 1 && currEnemy.getY() == j + 1) {
+							towerMap[i][j].addEnemy(currEnemy);
+							hasEnemy = true;
+						}
+						// lower left diagonal
+						else if(currEnemy.getX() == i + 1 && currEnemy.getY() == j - 1) {
+							towerMap[i][j].addEnemy(currEnemy);
+							hasEnemy = true;
+						}
+						// left
+						else if(currEnemy.getX() == i && currEnemy.getY() == j - 1) {
+							towerMap[i][j].addEnemy(currEnemy);
+							hasEnemy = true;
+						}
+						// right
+						else if(currEnemy.getX() == i && currEnemy.getY() == j + 1) {
+							towerMap[i][j].addEnemy(currEnemy);
+							hasEnemy = true;
+						}
+							
+						if (hasEnemy) {
+							//System.out.println(towers[i][j].attackPower);
+								
+							if (towerMap[i][j] instanceof MeeseeksTower) {
+								int damageMultiplier = (int) (Math.random() * 100);
+								if (damageMultiplier <= 50) {
 									currEnemy.takeDamage(towerMap[i][j].attackPower * 2);
 								} else {
 									currEnemy.takeDamage(towerMap[i][j].attackPower);
 								}
+							} else if (towerMap[i][j] instanceof SquanchyTower) {
+								int damageMultiplier = (int) (Math.random() * 100);
+								if (damageMultiplier <= 25) {
+									currEnemy.takeDamage(towerMap[i][j].attackPower * 4);
+								} else {
+									currEnemy.takeDamage(towerMap[i][j].attackPower);
+								}
+							} else if (towerMap[i][j] instanceof JerryTower && currEnemy
+									instanceof DoofusRickEnemy) {
+								currEnemy.takeDamage(towerMap[i][j].attackPower * 2);
+							} else {
+								currEnemy.takeDamage(towerMap[i][j].attackPower);
+								//System.out.println(currEnemy.getHealth());
+							}
 						}
 						if((currEnemy.getHealth() < temp) && (currEnemy.getHealth() != 0)) {
 							addAttackMoney();
 						}
-						// remove dead enemies
 						if (currEnemy.getHealth() <= 0) {
 							currEnemy.setAlive(false);
 							enemyMap.remove(currEnemy);
+
 						}
 					}
 				}
-				//System.out.println(numAttacks);
 			}
 		}
 	}

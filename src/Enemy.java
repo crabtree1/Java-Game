@@ -74,6 +74,7 @@ public class Enemy {
 		this.y = y;
 	}
 	
+	public void setCoords(int x, int y) {
 	/**
 	 * Setter method to set both the x and y coordinates for the given enemy
 	 * @param x - int value that the x will be changed to
