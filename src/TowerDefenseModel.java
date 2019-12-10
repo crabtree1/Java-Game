@@ -13,7 +13,7 @@ public class TowerDefenseModel extends Observable{
 	private String gamePhase;
 	private int roundEnemies;
 	private int[][] pathToFollow;
-	private Integer round = 1;
+	private int round = 1;
 	private int probability = 1;
 	
 	public TowerDefenseModel() {
@@ -24,7 +24,7 @@ public class TowerDefenseModel extends Observable{
 		enemyMap = new ArrayList<Enemy>();
 	}
 	
-	public Integer getRound(){
+	public int getRound(){
 		return this.round;
 	}
 	
