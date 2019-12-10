@@ -622,8 +622,6 @@ public class TowerDefenseView extends Application implements Observer {
 							//starting point
 							path.getElements().add(new MoveTo((towerMap[i][j].getX() * 47) + 23, (((towerMap[i][j].getY()) * 47) + 40)));
 							//ending point
-							System.out.println("Enemy X is " + enemiesList.get(k).getX());
-							System.out.println("Enemy Y is " + enemiesList.get(k).getY());
 							path.getElements().add(new LineTo((enemiesList.get(k).getY() * 47) + 23, ((enemiesList.get(k).getX() * 47)) + 40));
 							
 							//******DO NOT TOUCH************
