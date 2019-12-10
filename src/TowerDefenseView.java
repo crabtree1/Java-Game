@@ -1,3 +1,15 @@
+/**
+ * Tower Defense View class that represents the gui representation
+ * for the game. This class contains a private inner class that
+ * holds a dialog box that allows the player to play on a server
+ * with someone else. The rest of the class establishes the game
+ * board's visuals, properly laying out the starting menu, allowing
+ * the user to pick their stage, click on towers, click where to
+ * place their towers, and starting, pausing, and fast forwarding
+ * the game when they click the respective buttons.
+ * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
+ */
+
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -38,6 +50,13 @@ import javafx.util.Duration;
 
 public class TowerDefenseView extends Application implements Observer {
 	
+	/**
+	 * Private inner class that creates the two player dialog
+	 * boxes necessary to properly set the settings for networked
+	 * game play
+	 * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
+	 *
+	 */
 	private class TwoPlayerDialogBox extends Stage {
 		/**
 		 * Holds the data to select if it is a server or client
@@ -168,8 +187,6 @@ public class TowerDefenseView extends Application implements Observer {
 		}
 	}
 
-	
-
 	private TowerDefenseModel model;
 	private TowerDefenseController controller;
 	private BorderPane border;
@@ -184,6 +201,9 @@ public class TowerDefenseView extends Application implements Observer {
 	private Stage stage;
 	private Text roundLabel;
 	
+	/**
+	 * Method to launch the gui and set all proper menus and pictures
+	 */
 	@Override
 	public void start(Stage stage) throws Exception {
 		this.stage = stage;
@@ -218,8 +238,6 @@ public class TowerDefenseView extends Application implements Observer {
 		Image titleScreen = new Image("pictures/titleScreen.png");
 		mainMenu.setFill(new ImagePattern(titleScreen));
 		border.setCenter(mainMenu);
-		
-		
 
 		// right bar (width): 295px
 		// map (width): 705px
@@ -228,6 +246,11 @@ public class TowerDefenseView extends Application implements Observer {
 		stage.show();
 	}
 	
+	/**
+	 * Method that launches the playable game stage. It loads all proper
+	 * graphics for the road and towers, as well as all buttons necessary
+	 * for gameplay
+	 */
 	public void startGame() {
 		//Creates side bar
 		sideBar = new VBox();
@@ -445,6 +468,10 @@ public class TowerDefenseView extends Application implements Observer {
 		border.setTop(hbox);
 	}
 	
+	/**
+	 * Method to set the portrait of the gui depending on what
+	 * tower the user has clicked on most recently
+	 */
 	public void setPortrait() {
 		Rectangle portrait = new Rectangle();
 		portrait.setWidth(295);
@@ -460,7 +487,13 @@ public class TowerDefenseView extends Application implements Observer {
 		towerBox.getChildren().add(towerText);
 	}
 
-	
+	/**
+	 * Method to find the (Rectangle) node at a given set of coordniates
+	 * in the grid.
+	 * @param x - x coordinate to search for the node
+	 * @param y - y coordinate to search for the node
+	 * @return the Rectangle node if there is one at the position, null otherwise
+	 */
 	public Rectangle findNode(int x, int y) {
 		for (Node node: grid.getChildren()) {
 			if(grid.getRowIndex(node) == x && grid.getColumnIndex(node) == y) {
@@ -471,6 +504,11 @@ public class TowerDefenseView extends Application implements Observer {
 		return null;
 	}
 	
+	/**
+	 * Private method that creates the dialog alert when the user has lost the
+	 * gamee, meaning the user's health has been depleted to 0. This alert gives
+	 * them an option to start a new game as well.
+	 */
 	private void showLost() {
 		Alert lossAlert = new Alert(AlertType.INFORMATION);
 		lossAlert.setHeaderText("Message");
@@ -489,6 +527,10 @@ public class TowerDefenseView extends Application implements Observer {
 		
 	}
 	
+	/**
+	 * Private method that creates the dialog alert when the user has won the
+	 * game. This alert gives them the option to start a new game.
+	 */
 	private void showWin() {
 		Alert winAlert = new Alert(AlertType.INFORMATION);
 		winAlert.setHeaderText("Winner!");
@@ -507,8 +549,16 @@ public class TowerDefenseView extends Application implements Observer {
 		
 	}
 
+	/**
+	 * Method that helps the gui run the actual game logic from the controller.
+	 * It has varying behaviors depending on the phase of the game (attack or place)
+	 * and provides the most up to date graphic representation of the game being
+	 * played in the model.
+	 */
 	@Override
 	public void update(Observable o, Object arg) {
+		// in the place phase, determine if the user has won the game, and if not
+		// allow them to place towers and update the gui accordingly
 		if (controller.getGamePhase().equals("place")) {
 			if (arg == null) {
 				if (controller.getRound() == 3) {
@@ -530,6 +580,8 @@ public class TowerDefenseView extends Application implements Observer {
 		        curr.setFill(new ImagePattern(pic));
 			}
 		} else {
+			// in the attack phase, run the game as normal until the round
+			// is over or the user has died.
 			if(this.controller.getHealth() <= 0) {
 				lives.setText("0");
 				Platform.runLater(new Runnable() {
@@ -541,6 +593,8 @@ public class TowerDefenseView extends Application implements Observer {
 			} else {
 				lives.setText(Integer.toString(this.controller.getHealth()));
 			}
+			// have towers attack enemies, continue moving enemies along the path
+			// as long as they are alive
 			ArrayList<Enemy> enemies = (ArrayList<Enemy>) arg;
 			int[][] currMap = controller.getRoad().getMap();
 			this.controller.towerAttack();
@@ -603,7 +657,7 @@ public class TowerDefenseView extends Application implements Observer {
 						Rectangle curr = findNode(i, j);
 						for (int k = 0; k < enemies.size(); k++) {
 							Enemy currEnemy = enemies.get(k);
-							if (i == currEnemy.getX() && j == currEnemy.getY() && currEnemy.getAlive()) {
+							if (i == currEnemy.getX() && j == currEnemy.getY()) {
 								Image enemyPic = new Image(currEnemy.getTowerPic());
 								curr.setFill(new ImagePattern(enemyPic));
 								found = true;
@@ -619,38 +673,6 @@ public class TowerDefenseView extends Application implements Observer {
 				}
 			}
 			money.setText(Integer.toString(this.controller.getMoney()));
-			/*
-			Tower[][] towers = controller.getTowerMap();
-			for (int i = 0; i < towers.length; i ++) {
-				for (int j = 0; j < towers[i].length; j ++) {
-					for (int k = 0; k < enemies.size(); k ++) {
-						Enemy currEnemy = enemies.get(k);
-						if (towers[i][j] != null) {
-							int temp = currEnemy.getHealth();
-							if (towers[i][j] instanceof BirdPersonTower) {
-								currEnemy.takeDamage(1);
-								System.out.println(currEnemy.getHealth());
-							} else if (currEnemy.getX() == i + 1 && currEnemy.getY() == j || //below
-								currEnemy.getX() == i - 1 && currEnemy.getY() == j || // above
-								currEnemy.getX() == i + 1 && currEnemy.getY() == j + 1 || // lower right diagonal
-								currEnemy.getX() == i - 1 && currEnemy.getY() == j - 1 || // upper left diagonal
-								currEnemy.getX() == i - 1 && currEnemy.getY() == j + 1 || // upper right diagonal
-								currEnemy.getX() == i + 1 && currEnemy.getY() == j - 1 || // lower left diagonal
-								currEnemy.getX() == i && currEnemy.getY() == j - 1 || // left
-								currEnemy.getX() == i && currEnemy.getY() == j + 1) { // right
-									//System.out.println(towers[i][j].attackPower);
-									currEnemy.takeDamage(towers[i][j].attackPower);
-									System.out.println(currEnemy.getHealth());
-							}
-							if((currEnemy.getHealth() < temp) && (currEnemy.getHealth() != 0)) {
-								this.controller.addAttackMoney();
-								money.setText(Integer.toString(this.controller.getMoney()));
-							}
-						}
-					}
-				}
-			}
-			*/
 		}
 	}
 }

@@ -1,3 +1,12 @@
+/**
+ * Class that represents the model for our tower defense game. The model
+ * contains a 2D array of the towers, an array of all enemies, the road
+ * used for the current stage, keeps track of health, money, game speed, 
+ * the current game phase, and the current round. This is where towers
+ * attack enemies, enemeis are generated and moved, and towers can be placed.
+ * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
+ */
+
 import java.util.ArrayList;
 import java.util.Observable;
 
@@ -13,9 +22,12 @@ public class TowerDefenseModel extends Observable{
 	private String gamePhase;
 	private int roundEnemies;
 	private int[][] pathToFollow;
-	private Integer round = 1;
+	private int round = 1;
 	private int probability = 1;
 	
+	/**
+	 * Constructor for the tower defense model
+	 */
 	public TowerDefenseModel() {
 		roundEnemies = 40;
 		gamePhase = "place";
@@ -24,19 +36,35 @@ public class TowerDefenseModel extends Observable{
 		enemyMap = new ArrayList<Enemy>();
 	}
 	
-	public Integer getRound(){
+	/**
+	 * Getter to get the current round of the game
+	 * @return current game round
+	 */
+	public int getRound(){
 		return this.round;
 	}
 	
+	/**
+	 * Setter to set the model's road to currRoad
+	 * @param currRoad - Road object that will be the model's road
+	 */
 	public void setRoad(Road currRoad) {
 		road = currRoad;
 		pathToFollow = road.getPath();
 	}
 	
+	/**
+	 * Getter to get the current game phase
+	 * @return the game phase
+	 */
 	public String getGamePhase() {
 		return this.gamePhase;
 	}
 	
+	/**
+	 * Method to increase the speed of the game and loop around
+	 * back to the original speed
+	 */
 	public void increaseGameSpeed() {
 		if(this.gameSpeed == 40) {
 			this.gameSpeed = 120;
@@ -45,10 +73,19 @@ public class TowerDefenseModel extends Observable{
 		}
 	}
 	
+	/**
+	 * Method to change the current status of the game being paused
+	 */
 	public void changePaused() {
 		this.paused = !this.paused;
 	}
 	
+	/**
+	 * Method to begin the enemy attacks. Once the round starts, users
+	 * cannot place new towers, enemies are created and moved. Once all
+	 * enemies have been defeated, the game phase swaps back into placing
+	 * towers, the round increases, and the number of enemies in the next round increases.
+	 */
 	public void startRound() {
 		gamePhase = "attack";
 		Thread thread = new Thread(){
@@ -88,6 +125,12 @@ public class TowerDefenseModel extends Observable{
 		thread.start();
 	}
 	
+	/**
+	 * Method to create an enemy. The type of enemy is determined
+	 * by a random number generated when this function is called, and
+	 * adds this new enemy to the enemy list.
+	 * @param randomEnemy - specifies the type of enemy to create
+	 */
 	public void createEnemy(int randomEnemy) {
 		if(health < 0) {
 			return;
@@ -106,10 +149,14 @@ public class TowerDefenseModel extends Observable{
 		}
 		
 		
-		enemy.setCoords(road.getStartingPos()[0], road.getStartingPos()[1]);
+		enemy.setCords(road.getStartingPos()[0], road.getStartingPos()[1]);
 		enemyMap.add(enemy);
 	}
 	
+	/**
+	 * Method to move enemies along the road, as long as the user is
+	 * alive and the given enemy is alive
+	 */
 	public void moveEnemies() {
 		if (health > 0) {
 			for (int i = 0; i < enemyMap.size(); i++) {
@@ -124,11 +171,17 @@ public class TowerDefenseModel extends Observable{
 		}
 	}
 	
+	/**
+	 * Method to find the next position to move an enemy to.
+	 * The enemies will continue to find a new next until they
+	 * are dead or have reached the end of the board
+	 * @param e - current enemy to find the next for
+	 */
 	public void findNext(Enemy e) {
 		int[] enemyCoords = {e.getX(), e.getY()};
 		for (int i = 0; i < pathToFollow.length - 1; i++) {
 			if (pathToFollow[i][0] == enemyCoords[0] && pathToFollow[i][1] == enemyCoords[1]) {
-				e.setCoords(pathToFollow[i+1][0], pathToFollow[i+1][1]);
+				e.setCords(pathToFollow[i+1][0], pathToFollow[i+1][1]);
 				return;
 			}
 		}
@@ -138,24 +191,30 @@ public class TowerDefenseModel extends Observable{
 		enemyMap.remove(e);
 	}
 	
-	/*
-	public void printPath() {
-		for (int i = 0; i < pathToFollow.length; i++) {
-			for (int j = 0; j < pathToFollow[i].length; j++) {
-				System.out.print(pathToFollow[i][j] + ",");
-			}
-			System.out.println();
-		}
-	}*/
-	
+	/**
+	 * Getter to return the road in the model
+	 * @return the road used in the model
+	 */
 	public Road getRoad() {
 		return road;
 	}
 	
+	/**
+	 * Method to return the tower map in the model
+	 * @return the 2D tower map array
+	 */
 	public Tower[][] getTowerMap() {
 		return towerMap;
 	}
 	
+	/**
+	 * Method to add a tower at the given x and y values. Towers can only be placed
+	 * if the tower is properly initialized and there are no towers at that point
+	 * and it is not part of the road and the game is in the place phase.
+	 * @param currTowerClicked - tower object to be placed
+	 * @param x - x coordinate to place the tower
+	 * @param y - y coordinate to place the tower
+	 */
 	public void addTower(Tower currTowerClicked, int x, int y) {
 		if (currTowerClicked != null && towerMap[x][y] == null && road.getMap()[x][y] == 0 && gamePhase.equals("place")) {
 			towerMap[x][y] = currTowerClicked;
@@ -166,6 +225,13 @@ public class TowerDefenseModel extends Observable{
 		}
 	}
 	
+	/**
+	 * Method to check if there is a tower at a given point in the
+	 * tower map
+	 * @param x - x value to check for a tower
+	 * @param y - y value to check for a tower
+	 * @return true if there is a tower, false otherwise
+	 */
 	public boolean towerAtPosition(int x, int y) {
 		if(towerMap[x][y] != null) {
 			return true;
@@ -173,10 +239,23 @@ public class TowerDefenseModel extends Observable{
 		return false;
 	}
 	
+	/**
+	 * Method to return the tower object at a given point
+	 * @param x - x value to get the tower from
+	 * @param y - y value to get the tower from
+	 * @return the tower at the given position
+	 */
 	public Tower getTowerAtPost(int x, int y) {
 		return towerMap[x][y];
 	}
 	
+	/**
+	 * Method to remove the current tower object from the tower map,
+	 * meaning it has been sold
+	 * @param currTowerClicked - tower object to be removed
+	 * @param x - x value to remove the tower from
+	 * @param y - y value to remove the tower from
+	 */
 	public void removeTower(Tower currTowerClicked, int x, int y) {
 		towerMap[x][y] = null;
 		this.money += currTowerClicked.getCost()/2;
@@ -186,28 +265,52 @@ public class TowerDefenseModel extends Observable{
 		notifyObservers(returnArray);
 	}
 	
+	/**
+	 * Getter to get the user's money
+	 * @return the money
+	 */
 	public int getMoney() {
 		return this.money;
 	}
 	
+	/**
+	 * Method for the user to lose health
+	 */
 	public void takeDamage() {
 		this.health -= 1;
 	}
 	
+	/**
+	 * Method to give the user more money once they have succesfully attacked
+	 * an enemy
+	 */
 	public void addAttackMoney() {
 		this.money += 1;
 	}
 	
+	/**
+	 * Method to subtract spent moeny from the user's total
+	 * @param amount - amount of money spent
+	 */
 	public void spendMoney(int amount) {
 		this.money -= amount;
 	}
 	
+	/**
+	 * getter method to get the health of the user
+	 * @return the user's health
+	 */
 	public int getHealth() {
 		return this.health;
 	}
 	
+	/**
+	 * Method to process all of the possible tower attacks. The function loops through
+	 * the tower map to find all of the towers, then loops through the enemies to see
+	 * if any enemies are touching the towers, and if they are, they are attacked.
+	 */
 	public void towerAttack() {
-		boolean hasEnemy;
+    boolean hasEnemy;
 		//Tower[][] towers = controller.getTowerMap();
 		for (int i = 0; i < towerMap.length; i ++) {
 			for (int j = 0; j < towerMap[i].length; j ++) {
@@ -301,23 +404,42 @@ public class TowerDefenseModel extends Observable{
 		}
 	}
 	
-	// getters/setters to help with testing
+	/**
+	 * Setter to set the user's money
+	 * @param amount - amount to set the money to
+	 */
 	public void setMoney(int amount) {
 		this.money = amount;
 	}
 	
+	/**
+	 * getter method to get the game's current speed
+	 * @return the current game speed
+	 */
 	public int getGameSpeed() {
 		return this.gameSpeed;
 	}
 	
+	/**
+	 * Getter method to return the current paused state of the game
+	 * @return true if the game is paused, false otherwise
+	 */
 	public boolean getPaused() {
 		return this.paused;
 	}
 	
+	/**
+	 * Getter method to return the current enemy array list
+	 * @return the enemy array list
+	 */
 	public ArrayList<Enemy> getEnemies() {
 		return this.enemyMap;
 	}
 	
+	/**
+	 * Setter to set the health of the user
+	 * @param amount - amount to set the health to
+	 */
 	public void setHealth(int amount) {
 		this.health = amount;
 	}
