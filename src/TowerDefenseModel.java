@@ -361,6 +361,7 @@ public class TowerDefenseModel extends Observable{
 						}
 					}
 				}
+				//System.out.println(numAttacks);
 			}
 		}
 	}
