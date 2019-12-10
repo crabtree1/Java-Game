@@ -16,6 +16,7 @@ public class TowerDefenseController {
 	private boolean isTurn = true;
 	private boolean isMultiplayer = false;
 	private boolean isClient = false;
+	private int curTowerType = 0;
 	private Image image = null;
 	
 	public TowerDefenseController(TowerDefenseModel model) {
@@ -64,8 +65,10 @@ public class TowerDefenseController {
 								otherMessage = (TDNetworkMessage) other;
 							} else if (other instanceof ArrayList<?>) {
 								model.setEnemies((ArrayList<Enemy>)other);
+								return;
 							} else {
 								startRound();
+								return;
 							}
 							if(otherMessage.getTower() == 0) {
 								image = new Image(new BirdPersonTower().getTowerPic());
@@ -88,11 +91,13 @@ public class TowerDefenseController {
 							}
 							// after finishing getting the opponets data, it is the current objects turn
 							setTurn(true);
+							//startListening();
 						}
 					});
 				} catch (ClassNotFoundException | IOException e) {
 					e.printStackTrace();
 				}
+				//startListening();
 			}
 		});
 		inputThread.start();
@@ -112,6 +117,24 @@ public class TowerDefenseController {
 		} else {
 			setRoad(new Road2());
 		}
+	}
+	
+	public void listenForPlay() {
+		Thread inputThread = new Thread(new Runnable() {
+			Object other = null;
+			@Override
+			public void run() {
+				while(!(other instanceof Boolean)) {
+					try {
+						other = ois.readObject();
+					} catch (ClassNotFoundException | IOException e) {
+						e.printStackTrace();
+					}
+				}
+				startRound();
+			}
+		});
+		inputThread.start();
 	}
 	
 	public void sendMap(TDNetworkMessage message) {
@@ -136,6 +159,10 @@ public class TowerDefenseController {
 	
 	public TowerDefenseModel getModel() {
 		return model;
+	}
+	
+	public void setTowerType(int curTower) {
+		this.curTowerType = curTower;
 	}
 	
 	public void setRoad(Road currRoad) {
@@ -219,7 +246,7 @@ public class TowerDefenseController {
 		model.addTower(currTowerClicked, row, col);
 		if(isMultiplayer) {
 			try {
-				oos.writeObject(new TDNetworkMessage(row, col, currTowerClicked.type));
+				oos.writeObject(new TDNetworkMessage(row, col, curTowerType));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

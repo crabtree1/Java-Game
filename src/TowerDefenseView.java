@@ -52,7 +52,6 @@ public class TowerDefenseView extends Application implements Observer {
 	private Stage stage;
 	private Text roundLabel;
 	private boolean isMultiplayer = false;
-	private int roadType = 1;
 	TwoPlayerDialogBox dialogBox;
 	
 	
@@ -95,7 +94,6 @@ public class TowerDefenseView extends Application implements Observer {
 							controller.sendMap(new TDNetworkMessage(1));
 						}
 						else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
-							this.roadType = 2;
 							controller.setRoad(new Road2());
 							controller.sendMap(new TDNetworkMessage(2));
 						}
@@ -194,6 +192,7 @@ public class TowerDefenseView extends Application implements Observer {
 		rickPanel.setFill(new ImagePattern(rickPanelImg));
 		rickTowerBox.getChildren().add(rickPanel);
 		rickTowerBox.setOnMouseClicked((event) -> {
+			controller.setTowerType(4);
 			currTowerClicked = new RickTower();
 			setPortrait();
 		});
@@ -208,6 +207,7 @@ public class TowerDefenseView extends Application implements Observer {
 		mortyPanel.setFill(new ImagePattern(mortyPanelImg));
 		mortyTowerBox.getChildren().add(mortyPanel);
 		mortyTowerBox.setOnMouseClicked((event) -> {
+			controller.setTowerType(3);
 			currTowerClicked = new MortyTower();
 			setPortrait();
 		});
@@ -222,6 +222,7 @@ public class TowerDefenseView extends Application implements Observer {
 		meeseeksPanel.setFill(new ImagePattern(meeseeksPanelImg));
 		meeseeksTowerBox.getChildren().add(meeseeksPanel);
 		meeseeksTowerBox.setOnMouseClicked((event) -> {
+			controller.setTowerType(2);
 			currTowerClicked = new MeeseeksTower();
 			setPortrait();
 		});
@@ -236,6 +237,7 @@ public class TowerDefenseView extends Application implements Observer {
 		jerryPanel.setFill(new ImagePattern(jerryPanelImg));
 		jerryTowerBox.getChildren().add(jerryPanel);
 		jerryTowerBox.setOnMouseClicked((event) -> {
+			controller.setTowerType(1);
 			currTowerClicked = new JerryTower();
 			setPortrait();
 		});
@@ -250,8 +252,9 @@ public class TowerDefenseView extends Application implements Observer {
 		birdpersonPanel.setFill(new ImagePattern(birdpersonPanelImg));
 		birdpersonTowerBox.getChildren().add(birdpersonPanel);
 		birdpersonTowerBox.setOnMouseClicked((event) -> {
-		currTowerClicked = new BirdPersonTower();
-		setPortrait();
+			controller.setTowerType(0);
+			currTowerClicked = new BirdPersonTower();
+			setPortrait();
 		});
 			
 		VBox squanchyTowerBox = new VBox();
@@ -264,6 +267,7 @@ public class TowerDefenseView extends Application implements Observer {
 		squanchyPanel.setFill(new ImagePattern(squanchyPanelImg));
 		squanchyTowerBox.getChildren().add(squanchyPanel);
 		squanchyTowerBox.setOnMouseClicked((event) -> {
+			controller.setTowerType(5);
 			currTowerClicked = new SquanchyTower();
 			setPortrait();
 		});
@@ -371,6 +375,7 @@ public class TowerDefenseView extends Application implements Observer {
 			controller.listenForMap();
 		}
 		if(dialogBox.createType()) {
+			controller.listenForPlay();
 			controller.startListening();
 		}
 		
