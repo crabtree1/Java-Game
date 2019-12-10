@@ -375,7 +375,7 @@ public class TowerDefenseView extends Application implements Observer {
 			controller.listenForMap();
 		}
 		if(dialogBox.createType()) {
-			controller.listenForPlay();
+			//controller.listenForPlay();
 			controller.startListening();
 		}
 		
