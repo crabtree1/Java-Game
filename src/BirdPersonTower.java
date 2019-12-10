@@ -1,6 +1,8 @@
 
 public class BirdPersonTower extends Tower{
 	
+	public static final int type = 0;
+	
 	public BirdPersonTower() {
 		super();
 		this.cost = 5;

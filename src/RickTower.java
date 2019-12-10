@@ -1,6 +1,8 @@
 
 public class RickTower extends Tower {
 	
+	public static final int type = 4;
+	
 	public RickTower() {
 		super();
 		this.attackPower = 10;

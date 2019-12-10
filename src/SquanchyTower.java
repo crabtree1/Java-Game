@@ -1,5 +1,7 @@
 public class SquanchyTower extends Tower {
 	
+	public static final int type = 5;
+	
 	public SquanchyTower() {
 		super();
 		this.attackPower = 15;

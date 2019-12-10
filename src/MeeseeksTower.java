@@ -1,6 +1,8 @@
 
 public class MeeseeksTower extends Tower {
 
+	public static final int type = 2;
+	
 	public MeeseeksTower() {
 		super();
 		this.attackPower = 25;

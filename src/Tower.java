@@ -1,6 +1,10 @@
+import java.io.Serializable;
+
 
 public class Tower {
 	
+	public static final int type = -1;
+
 	protected String towerPic;
 	protected String towerPortrait;
 	protected String towerName;

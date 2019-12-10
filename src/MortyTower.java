@@ -1,6 +1,8 @@
 
 public class MortyTower extends Tower {
 	
+	public static final int type = 3;
+	
 	public MortyTower() {
 		super();
 		this.attackPower = 5;
