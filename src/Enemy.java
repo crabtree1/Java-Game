@@ -41,7 +41,7 @@ public class Enemy {
 		this.y = y;
 	}
 	
-	public void setCords(int x, int y) {
+	public void setCoords(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}

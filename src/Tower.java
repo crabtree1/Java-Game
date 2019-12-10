@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class Tower {
 	
@@ -7,7 +8,8 @@ public class Tower {
 	private int x;
 	private int y;
 	protected int cost = 1;
-	protected int attackPower;
+	protected int attackPower = 0;
+	private ArrayList<ArrayList<Integer>> enemiesToAttack = new ArrayList<ArrayList<Integer>>();
 	
 	public Tower() {
 		this.x = 0;
@@ -54,5 +56,20 @@ public class Tower {
 	
 	public int getAttackPower() {
 		return this.attackPower;
+	}
+	
+	public void addEnemy(int i, int j) {
+		ArrayList<Integer> curr = new ArrayList<Integer>();
+		curr.add(i);
+		curr.add(j);
+		enemiesToAttack.add(curr);
+	}
+	
+	public void clearEnemies() {
+		enemiesToAttack.clear();
+	}
+	
+	public ArrayList<ArrayList<Integer>> getEnemiesToAttack() {
+		return enemiesToAttack;
 	}
 }
