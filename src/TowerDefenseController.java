@@ -4,6 +4,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import javax.print.attribute.standard.MediaSize.Other;
+
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 
@@ -53,51 +55,55 @@ public class TowerDefenseController {
 		Thread inputThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				otherMessage = null;
-				try {
-					//System.out.println(isTurn);
-					Object other = ois.readObject();
-					// after reading the object, it sends an update event to the main thread to update the gui
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							if(other instanceof TDNetworkMessage) {
-								otherMessage = (TDNetworkMessage) other;
-							} else if (other instanceof ArrayList<?>) {
-								model.setEnemies((ArrayList<Enemy>)other);
-								return;
-							} else {
-								//startRound();
-								return;
+				while(true) {
+					otherMessage = null;
+					try {
+						//System.out.println(isTurn);
+						Object other = ois.readObject();
+						// after reading the object, it sends an update event to the main thread to update the gui
+						Platform.runLater(new Runnable() {
+							@Override
+							public void run() {
+								if(other instanceof TDNetworkMessage) {
+									otherMessage = (TDNetworkMessage) other;
+								} else if (other instanceof ArrayList<?>) {
+									model.setEnemies((ArrayList<Enemy>)other);
+									return;
+								}
+								
+								if(otherMessage.isPlaying()) {
+									startRound();
+								} else if(otherMessage.isPuased()) {
+									changePaused();
+								} else if(otherMessage.getTower() == 0) {
+									image = new Image(new BirdPersonTower().getTowerPic());
+									model.addTower(new BirdPersonTower(), otherMessage.getRow(), otherMessage.getColumn());
+								} else if (otherMessage.getTower() == 1) {
+									image = new Image(new JerryTower().getTowerPic());
+									model.addTower(new JerryTower(), otherMessage.getRow(), otherMessage.getColumn());
+								} else if (otherMessage.getTower() == 2) {
+									image = new Image(new MeeseeksTower().getTowerPic());
+									model.addTower(new MeeseeksTower(), otherMessage.getRow(), otherMessage.getColumn());
+								} else if (otherMessage.getTower() == 3) {
+									image = new Image(new MortyTower().getTowerPic());
+									model.addTower(new MortyTower(), otherMessage.getRow(), otherMessage.getColumn());
+								} else if (otherMessage.getTower() == 4) {
+									image = new Image(new RickTower().getTowerPic());
+									model.addTower(new RickTower(), otherMessage.getRow(), otherMessage.getColumn());
+								} else {
+									image = new Image(new SquanchyTower().getTowerPic());
+									model.addTower(new SquanchyTower(), otherMessage.getRow(), otherMessage.getColumn());
+								}
+								// after finishing getting the opponets data, it is the current objects turn
+								setTurn(true);
+								//startListening();
 							}
-							if(otherMessage.getTower() == 0) {
-								image = new Image(new BirdPersonTower().getTowerPic());
-								model.addTower(new BirdPersonTower(), otherMessage.getRow(), otherMessage.getColumn());
-							} else if (otherMessage.getTower() == 1) {
-								image = new Image(new JerryTower().getTowerPic());
-								model.addTower(new JerryTower(), otherMessage.getRow(), otherMessage.getColumn());
-							} else if (otherMessage.getTower() == 2) {
-								image = new Image(new MeeseeksTower().getTowerPic());
-								model.addTower(new MeeseeksTower(), otherMessage.getRow(), otherMessage.getColumn());
-							} else if (otherMessage.getTower() == 3) {
-								image = new Image(new MortyTower().getTowerPic());
-								model.addTower(new MortyTower(), otherMessage.getRow(), otherMessage.getColumn());
-							} else if (otherMessage.getTower() == 4) {
-								image = new Image(new RickTower().getTowerPic());
-								model.addTower(new RickTower(), otherMessage.getRow(), otherMessage.getColumn());
-							} else {
-								image = new Image(new SquanchyTower().getTowerPic());
-								model.addTower(new SquanchyTower(), otherMessage.getRow(), otherMessage.getColumn());
-							}
-							// after finishing getting the opponets data, it is the current objects turn
-							setTurn(true);
-							//startListening();
-						}
-					});
-				} catch (ClassNotFoundException | IOException e) {
-					e.printStackTrace();
+						});
+					} catch (ClassNotFoundException | IOException e) {
+						e.printStackTrace();
+					}
+					//startListening();
 				}
-				//startListening();
 			}
 		});
 		inputThread.start();
@@ -153,6 +159,7 @@ public class TowerDefenseController {
 	}
 	
 	public void sendPlay() {
+		System.out.print("Here1");
 		try {
 			oos.writeObject(new TDNetworkMessage(true));
 		} catch (IOException e) {
@@ -215,7 +222,7 @@ public class TowerDefenseController {
 	}
 	
 	public void addTower(Tower currTowerClicked, double mouseX, double mouseY) {
-		System.out.println("Here1" + isTurn);
+		//System.out.println("Here1" + isTurn);
 		if(!isTurn) {
 			return;
 		}
@@ -258,7 +265,7 @@ public class TowerDefenseController {
 				e.printStackTrace();
 			}
 			this.isTurn = false;
-			startListening();
+			//startListening();
 		}
 	}
 	
@@ -328,5 +335,15 @@ public class TowerDefenseController {
 	
 	public Integer getRound() {
 		return this.model.getRound();
+	}
+
+	public void sendPause() {
+		TDNetworkMessage temp = new TDNetworkMessage();
+		temp.setPaused(true);
+		try {
+			oos.writeObject(temp);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

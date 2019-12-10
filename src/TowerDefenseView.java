@@ -316,7 +316,12 @@ public class TowerDefenseView extends Application implements Observer {
 					temp.setFill(new ImagePattern(pause));
 					temp.setOnMouseClicked(e -> {
 						if (controller.getGamePhase().equals("attack")) {
-							controller.changePaused();
+							if(isMultiplayer) {
+								controller.sendPause();
+								controller.changePaused();
+							} else {
+								controller.changePaused();
+							}
 						}
 					});
 				} else if (currMap[i][j] == 4){
@@ -324,9 +329,13 @@ public class TowerDefenseView extends Application implements Observer {
 					temp.setFill(new ImagePattern(play));
 					temp.setOnMouseClicked(e -> {
 						if (controller.getGamePhase().equals("place")) {
-							controller.startRound();
-							if(!dialogBox.createType()) {
-								controller.sendPlay();
+							if(isMultiplayer) {
+								if(!dialogBox.createType()) {
+									controller.sendPlay();
+									controller.startRound();
+								}
+							} else {
+								controller.startRound();
 							}
 						}
 					});
@@ -358,6 +367,7 @@ public class TowerDefenseView extends Application implements Observer {
 				ServerSocket server = new ServerSocket(this.dialogBox.getPort());
 				socket = server.accept();
 				server.close();
+				System.out.println("Server");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -374,9 +384,10 @@ public class TowerDefenseView extends Application implements Observer {
 		if(dialogBox.createType()) {
 			controller.listenForMap();
 		}
+		controller.startListening();
 		if(dialogBox.createType()) {
-			controller.listenForPlay();
-			controller.startListening();
+			//controller.listenForPlay();
+			//controller.startListening();
 		}
 		
 	}
