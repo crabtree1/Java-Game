@@ -282,4 +282,8 @@ public class TowerDefenseModel extends Observable{
 		this.health = amount;
 	}
 	
+	public void setEnemies(ArrayList<Enemy> enemyMap) {
+		this.enemyMap = enemyMap;
+	}
+	
 }

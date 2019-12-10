@@ -90,6 +90,30 @@ public class TowerDefenseController {
 		inputThread.start();
 	}
 	
+	
+	public void listenForMap() {
+		try {
+			otherMessage = (TDNetworkMessage) ois.readObject();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if(otherMessage.getMap() == 1) {
+			setRoad(new Road1());
+		} else {
+			setRoad(new Road2());
+		}
+	}
+	
+	public void sendMap(TDNetworkMessage message) {
+		try {
+			oos.writeObject(message);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void setModel(TowerDefenseModel model) {
 		this.model = model;
 	}
@@ -165,12 +189,12 @@ public class TowerDefenseController {
 				row = i;
 			}
 		}
-		if(!isClient) {
+		if(!isClient && isMultiplayer) {
 			if(col < 8) {
 				return;
 			}
 				
-		} else if (isClient) {
+		} else if (isClient && isMultiplayer) {
 			if(col > 7) {
 				return;
 			}
@@ -178,7 +202,6 @@ public class TowerDefenseController {
 		this.model.spendMoney(currTowerClicked.getCost());
 		model.addTower(currTowerClicked, row, col);
 		if(isMultiplayer) {
-			System.out.print("Here");
 			try {
 				oos.writeObject(new TDNetworkMessage(row, col, currTowerClicked.type));
 			} catch (IOException e) {

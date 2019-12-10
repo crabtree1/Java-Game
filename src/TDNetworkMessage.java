@@ -6,11 +6,16 @@ public class TDNetworkMessage implements Serializable {
 	       private int row;
 	       private int col;
 	       private int towerType;
+	       private int mapSelection;
 
 	       public TDNetworkMessage(int row, int col, int towerType) {
 	    	   this.row = row;
 	    	   this.col = col;
 	    	   this.towerType = towerType;
+	       }
+	       
+	       public TDNetworkMessage(int mapSelection) {
+	    	   this.mapSelection = mapSelection;
 	       }
 
 	       /**
@@ -33,5 +38,9 @@ public class TDNetworkMessage implements Serializable {
 
 	       public int getTower() {
 	    	   return this.towerType;
+	       }
+	       
+	       public int getMap() {
+	    	   return this.mapSelection;
 	       }
 }
