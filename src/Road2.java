@@ -1,6 +1,17 @@
+/**
+ * Road2 is a subclass of the Road class. This will specify a particular layout
+ * for one of the game stages. 2s represent enemy portals, 1s are the path for
+ * the enemies to follow, 0s are placeable squares for towers, and 3, 4, and
+ * 5 represent squares for the start, pause and fast forward buttons
+ * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
+ *
+ */
 
 public class Road2 extends Road {
 
+	/**
+	 * Constructor for the Road2 class
+	 */
 	public Road2() {
 		map = new int[13][15];
 		
@@ -44,6 +55,13 @@ public class Road2 extends Road {
 		super.startingPos = temp2;
 	}
 	
+	/**
+	 * Getter to return the int value for a given point in the
+	 * road
+	 * @param row - row in the map to get the value from
+	 * @param col - col in the map to get the value from
+	 * @return the int value at row, col
+	 */
 	public int getValAtPos(int row, int col) {
 		return map[row][col];
 	}

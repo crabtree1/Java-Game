@@ -13,7 +13,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
@@ -54,15 +53,13 @@ public class TowerDefenseView extends Application implements Observer {
 	private boolean isMultiplayer = false;
 	TwoPlayerDialogBox dialogBox;
 	
-	
-	
 	@Override
 	public void start(Stage stage) throws Exception {
 		this.stage = stage;
 		model = new TowerDefenseModel();
 		controller = new TowerDefenseController(model);
 		model.addObserver(this);
-
+		
 		stage.setTitle("Rick and Morty Tower Defense");
 		
 		border = new BorderPane();
@@ -355,6 +352,7 @@ public class TowerDefenseView extends Application implements Observer {
 			}
 		}
 		border.setCenter(grid);
+		
 
 		roundLabel = new Text("Round 1");
 		HBox hbox = new HBox();
@@ -483,8 +481,6 @@ public class TowerDefenseView extends Application implements Observer {
 					pic = new Image(currTowerClicked.getTowerPic());
 				}
 		        curr.setFill(new ImagePattern(pic));
-				//pic = new Image(currTowerClicked.getTowerPic());
-		       // curr.setFill(new ImagePattern(pic));
 			}
 		} else {
 			if(this.controller.getHealth() <= 0) {
@@ -508,7 +504,7 @@ public class TowerDefenseView extends Application implements Observer {
 						Rectangle curr = findNode(i, j);
 						for (int k = 0; k < enemies.size(); k++) {
 							Enemy currEnemy = enemies.get(k);
-							if (i == currEnemy.getX() && j == currEnemy.getY() && currEnemy.getAlive()) {
+							if (i == currEnemy.getX() && j == currEnemy.getY()) {
 								Image enemyPic = new Image(currEnemy.getTowerPic());
 								curr.setFill(new ImagePattern(enemyPic));
 								found = true;
@@ -524,39 +520,6 @@ public class TowerDefenseView extends Application implements Observer {
 				}
 			}
 			money.setText(Integer.toString(this.controller.getMoney()));
-
-			/*
-			Tower[][] towers = controller.getTowerMap();
-			for (int i = 0; i < towers.length; i ++) {
-				for (int j = 0; j < towers[i].length; j ++) {
-					for (int k = 0; k < enemies.size(); k ++) {
-						Enemy currEnemy = enemies.get(k);
-						if (towers[i][j] != null) {
-							int temp = currEnemy.getHealth();
-							if (towers[i][j] instanceof BirdPersonTower) {
-								currEnemy.takeDamage(1);
-								System.out.println(currEnemy.getHealth());
-							} else if (currEnemy.getX() == i + 1 && currEnemy.getY() == j || //below
-								currEnemy.getX() == i - 1 && currEnemy.getY() == j || // above
-								currEnemy.getX() == i + 1 && currEnemy.getY() == j + 1 || // lower right diagonal
-								currEnemy.getX() == i - 1 && currEnemy.getY() == j - 1 || // upper left diagonal
-								currEnemy.getX() == i - 1 && currEnemy.getY() == j + 1 || // upper right diagonal
-								currEnemy.getX() == i + 1 && currEnemy.getY() == j - 1 || // lower left diagonal
-								currEnemy.getX() == i && currEnemy.getY() == j - 1 || // left
-								currEnemy.getX() == i && currEnemy.getY() == j + 1) { // right
-									//System.out.println(towers[i][j].attackPower);
-									currEnemy.takeDamage(towers[i][j].attackPower);
-									System.out.println(currEnemy.getHealth());
-							}
-							if((currEnemy.getHealth() < temp) && (currEnemy.getHealth() != 0)) {
-								this.controller.addAttackMoney();
-								money.setText(Integer.toString(this.controller.getMoney()));
-							}
-						}
-					}
-				}
-			}
-			*/
 		}
 	}
 	
