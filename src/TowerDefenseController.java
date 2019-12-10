@@ -97,6 +97,20 @@ public class TowerDefenseController {
 				row = i;
 			}
 		}
+		
+		if (currTowerClicked instanceof BirdPersonTower) {
+			currTowerClicked = new BirdPersonTower();
+		} else if (currTowerClicked instanceof JerryTower) {
+			currTowerClicked = new JerryTower();
+		}else if (currTowerClicked instanceof MeeseeksTower) {
+			currTowerClicked = new MeeseeksTower();
+		}else if (currTowerClicked instanceof MortyTower) {
+			currTowerClicked = new MortyTower();
+		} else if (currTowerClicked instanceof RickTower) {
+			currTowerClicked = new RickTower();
+		} else if (currTowerClicked instanceof SquanchyTower) {
+			currTowerClicked = new SquanchyTower();
+		} 
 		// subtract the tower cost from the user's money
 		this.model.spendMoney(currTowerClicked.getCost());
 		model.addTower(currTowerClicked, row, col);
@@ -207,5 +221,10 @@ public class TowerDefenseController {
 	 */
 	public int getRound() {
 		return this.model.getRound();
+	}
+	
+	
+	public Integer getGameSpeed() {
+		return this.model.getGameSpeed();
 	}
 }

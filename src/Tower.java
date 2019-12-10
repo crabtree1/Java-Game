@@ -16,7 +16,7 @@ public class Tower {
 	private int y;
 	protected int cost = 1;
 	protected int attackPower = 0;
-	private ArrayList<ArrayList<Integer>> enemiesToAttack = new ArrayList<ArrayList<Integer>>();
+	private ArrayList<Enemy> enemiesToAttack = new ArrayList<Enemy>();
 	
 	/**
 	 * Base constructor for the tower class
@@ -109,18 +109,15 @@ public class Tower {
 		return this.attackPower;
 	}
 	
-	public void addEnemy(int i, int j) {
-		ArrayList<Integer> curr = new ArrayList<Integer>();
-		curr.add(i);
-		curr.add(j);
-		enemiesToAttack.add(curr);
+	public void addEnemy(Enemy e) {
+		enemiesToAttack.add(e);
 	}
 	
 	public void clearEnemies() {
 		enemiesToAttack.clear();
 	}
 	
-	public ArrayList<ArrayList<Integer>> getEnemiesToAttack() {
+	public ArrayList<Enemy> getEnemiesToAttack() {
 		return enemiesToAttack;
 	}
 }

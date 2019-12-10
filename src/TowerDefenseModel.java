@@ -149,7 +149,7 @@ public class TowerDefenseModel extends Observable{
 		}
 		
 		
-		enemy.setCoords(road.getStartingPos()[0], road.getStartingPos()[1]);
+		enemy.setCords(road.getStartingPos()[0], road.getStartingPos()[1]);
 		enemyMap.add(enemy);
 	}
 	
@@ -181,7 +181,7 @@ public class TowerDefenseModel extends Observable{
 		int[] enemyCoords = {e.getX(), e.getY()};
 		for (int i = 0; i < pathToFollow.length - 1; i++) {
 			if (pathToFollow[i][0] == enemyCoords[0] && pathToFollow[i][1] == enemyCoords[1]) {
-				e.setCoords(pathToFollow[i+1][0], pathToFollow[i+1][1]);
+				e.setCords(pathToFollow[i+1][0], pathToFollow[i+1][1]);
 				return;
 			}
 		}
