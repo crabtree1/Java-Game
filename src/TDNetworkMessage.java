@@ -7,6 +7,7 @@ public class TDNetworkMessage implements Serializable {
 	       private int col;
 	       private int towerType;
 	       private int mapSelection;
+	       private boolean isPlaying = false;
 
 	       public TDNetworkMessage(int row, int col, int towerType) {
 	    	   this.row = row;
@@ -16,6 +17,10 @@ public class TDNetworkMessage implements Serializable {
 	       
 	       public TDNetworkMessage(int mapSelection) {
 	    	   this.mapSelection = mapSelection;
+	       }
+	       
+	       public TDNetworkMessage(boolean playing) {
+	    	   this.isPlaying = playing;
 	       }
 
 	       /**
@@ -42,5 +47,9 @@ public class TDNetworkMessage implements Serializable {
 	       
 	       public int getMap() {
 	    	   return this.mapSelection;
+	       }
+	       
+	       public boolean isPlaying() {
+	    	   return this.isPlaying;
 	       }
 }

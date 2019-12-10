@@ -67,7 +67,7 @@ public class TowerDefenseController {
 								model.setEnemies((ArrayList<Enemy>)other);
 								return;
 							} else {
-								startRound();
+								//startRound();
 								return;
 							}
 							if(otherMessage.getTower() == 0) {
@@ -124,14 +124,21 @@ public class TowerDefenseController {
 			Object other = null;
 			@Override
 			public void run() {
-				while(!(other instanceof Boolean)) {
-					try {
-						other = ois.readObject();
-					} catch (ClassNotFoundException | IOException e) {
-						e.printStackTrace();
-					}
+				try {
+					other = ois.readObject();
+				} catch (ClassNotFoundException | IOException e) {
+					e.printStackTrace();
 				}
-				startRound();
+				if (other instanceof TDNetworkMessage) {
+					otherMessage = (TDNetworkMessage) other;
+					if(otherMessage.isPlaying()) {
+						startRound();
+					} else {
+						run();
+					}
+				} else {
+					run();
+				}
 			}
 		});
 		inputThread.start();
@@ -147,7 +154,7 @@ public class TowerDefenseController {
 	
 	public void sendPlay() {
 		try {
-			oos.writeObject(true);
+			oos.writeObject(new TDNetworkMessage(true));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
