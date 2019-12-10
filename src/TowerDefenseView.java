@@ -62,7 +62,7 @@ public class TowerDefenseView extends Application implements Observer {
 		model = new TowerDefenseModel();
 		controller = new TowerDefenseController(model);
 		model.addObserver(this);
-		
+
 		stage.setTitle("Rick and Morty Tower Defense");
 		
 		border = new BorderPane();
