@@ -213,7 +213,7 @@ public class TowerDefenseModel extends Observable{
 			for (int j = 0; j < towerMap[i].length; j ++) {
 				for (int k = 0; k < enemyMap.size(); k ++) {
 					Enemy currEnemy = enemyMap.get(k);
-					if (towerMap[i][j] != null) {
+					if (towerMap[i][j] != null) {						
 						int temp = currEnemy.getHealth();
 						hasEnemy = false;
 						if (towerMap[i][j] instanceof BirdPersonTower) {
@@ -221,45 +221,44 @@ public class TowerDefenseModel extends Observable{
 							//System.out.println(currEnemy.getHealth());
 							
 						} 
-						
 						//below
 						else if (currEnemy.getX() == i + 1 && currEnemy.getY() == j) {
-							towerMap[i][j].addEnemy(i + 1, j);
+							towerMap[i][j].addEnemy(currEnemy);
 							hasEnemy = true;
 						}
 						//above
 						else if (currEnemy.getX() == i - 1 && currEnemy.getY() == j) {
-							towerMap[i][j].addEnemy(i - 1, j);
+							towerMap[i][j].addEnemy(currEnemy);
 							hasEnemy = true;
 						}
 						// lower right diagonal
 						else if(currEnemy.getX() == i + 1 && currEnemy.getY() == j + 1) {
-							towerMap[i][j].addEnemy(i + 1, j + 1);
+							towerMap[i][j].addEnemy(currEnemy);
 							hasEnemy = true;
 						}
 						// upper left diagonal
 						else if(currEnemy.getX() == i - 1 && currEnemy.getY() == j - 1) {
-							towerMap[i][j].addEnemy(i - 1, j - 1);
+							towerMap[i][j].addEnemy(currEnemy);
 							hasEnemy = true;
 						}
 						// upper right diagonal
 						else if(currEnemy.getX() == i - 1 && currEnemy.getY() == j + 1) {
-							towerMap[i][j].addEnemy(i - 1, j + 1);
+							towerMap[i][j].addEnemy(currEnemy);
 							hasEnemy = true;
 						}
 						// lower left diagonal
 						else if(currEnemy.getX() == i + 1 && currEnemy.getY() == j - 1) {
-							towerMap[i][j].addEnemy(i + 1, j - 1);
+							towerMap[i][j].addEnemy(currEnemy);
 							hasEnemy = true;
 						}
 						// left
 						else if(currEnemy.getX() == i && currEnemy.getY() == j - 1) {
-							towerMap[i][j].addEnemy(i, j - 1);
+							towerMap[i][j].addEnemy(currEnemy);
 							hasEnemy = true;
 						}
 						// right
 						else if(currEnemy.getX() == i && currEnemy.getY() == j + 1) {
-							towerMap[i][j].addEnemy(i, j + 1);
+							towerMap[i][j].addEnemy(currEnemy);
 							hasEnemy = true;
 						}
 							
@@ -294,8 +293,8 @@ public class TowerDefenseModel extends Observable{
 						if (currEnemy.getHealth() <= 0) {
 							currEnemy.setAlive(false);
 							enemyMap.remove(currEnemy);
+
 						}
-						System.out.println(i + ", " + j + ": " + towerMap[i][j].getEnemiesToAttack());
 					}
 				}
 			}

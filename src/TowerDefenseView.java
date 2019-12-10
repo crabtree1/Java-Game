@@ -554,26 +554,27 @@ public class TowerDefenseView extends Application implements Observer {
 					// IF TOWER IS NOT EQUAL TO NULL
 					if (towerMap[i][j] != null) {
 						//System.out.println("(" + i + ", " + j + ")");
-						ArrayList<ArrayList<Integer>> enemiesList = towerMap[i][j].getEnemiesToAttack();
+						ArrayList<Enemy> enemiesList = towerMap[i][j].getEnemiesToAttack();
 						//SEARCH THROUGH ENEMIES NEXT TO CURRENT TOWER
 						//System.out.println(enemiesList.size());
 						for (int k = 0; k < enemiesList.size(); k++) {
 							//*animation part*
 							Rectangle test = new Rectangle();
-							test.setWidth(5);
-							test.setHeight(5);
+							test.setWidth(10);
+							test.setHeight(10);
 							test.setFill(Color.RED);
 							Path path = new Path();
 							
 							//starting point
 							path.getElements().add(new MoveTo((towerMap[i][j].getX() * 47) + 23, (((towerMap[i][j].getY()) * 47) + 40)));
 							//ending point
-							//System.out.println(enemiesList.get(k));
-							path.getElements().add(new LineTo((enemiesList.get(k).get(1) * 47) + 23, ((enemiesList.get(k).get(0) * 47)) + 40));
+							System.out.println("Enemy X is " + enemiesList.get(k).getX());
+							System.out.println("Enemy Y is " + enemiesList.get(k).getY());
+							path.getElements().add(new LineTo((enemiesList.get(k).getY() * 47) + 23, ((enemiesList.get(k).getX() * 47)) + 40));
 							
 							//******DO NOT TOUCH************
 							PathTransition pathTransition = new PathTransition();
-							pathTransition.setDuration(Duration.millis(500));
+							pathTransition.setDuration(Duration.millis(controller.getGameSpeed()));
 							pathTransition.setNode(test);
 							pathTransition.setPath(path);
 							pathTransition.setOnFinished((eventTest) -> {
