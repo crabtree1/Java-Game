@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 import javax.print.attribute.standard.MediaSize.Other;
@@ -70,7 +71,6 @@ public class TowerDefenseController {
 									model.setEnemies((ArrayList<Enemy>)other);
 									return;
 								}
-								
 								if(otherMessage.isPlaying()) {
 									startRound();
 								} else if(otherMessage.isPuased()) {
@@ -101,10 +101,13 @@ public class TowerDefenseController {
 								//startListening();
 							}
 						});
-					} catch (ClassNotFoundException | IOException e) {
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					} catch (SocketException e) {
+						System.exit(1);
+					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					//startListening();
 				}
 			}
 		});

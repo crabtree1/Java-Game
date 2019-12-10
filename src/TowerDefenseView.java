@@ -71,6 +71,7 @@ public class TowerDefenseView extends Application implements Observer {
 		mainMenu.setHeight(711);
 		mainMenu.setOnMouseClicked((event) -> {
 			if (event.getX() > 45 && event.getX() < 380 && event.getY() > 350 && event.getY() < 411) {
+				isMultiplayer = false;
 				Image mapSelection = new Image("pictures/mapSelection.png");
 				mainMenu.setFill(new ImagePattern(mapSelection));
 				mainMenu.setOnMouseClicked((event2) -> {
@@ -331,9 +332,9 @@ public class TowerDefenseView extends Application implements Observer {
 						if (controller.getGamePhase().equals("place")) {
 							if(isMultiplayer) {
 								if(!dialogBox.createType()) {
-									controller.startRound();
-									controller.sendEnimies();
 									controller.sendPlay();
+									controller.startRound();
+									//controller.sendEnimies();
 								}
 							} else {
 								controller.startRound();
