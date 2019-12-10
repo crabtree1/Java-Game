@@ -1,6 +1,15 @@
 
+/**
+ * MortyTower is a subclass of Tower. Morty is a reliable tower, consistently
+ * doling out 5 points of damage to any enemy in its range.
+ * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
+ *
+ */
 public class MortyTower extends Tower {
 	
+	/**
+	 * Constructor for the morty towers
+	 */
 	public MortyTower() {
 		super();
 		this.attackPower = 5;
