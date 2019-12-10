@@ -84,7 +84,7 @@ public class TowerDefenseView extends Application implements Observer {
 					startGame();
 				});
 			}
-			
+		
 			else if (event.getX() > 40 && event.getX() < 336 && event.getY() > 455 && event.getY() < 520 ) {
 				dialogBox = new TwoPlayerDialogBox();
 				if(!dialogBox.createType()) {
