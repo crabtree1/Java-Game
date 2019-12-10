@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -54,11 +55,18 @@ public class TowerDefenseController {
 				otherMessage = null;
 				try {
 					//System.out.println(isTurn);
-					otherMessage = (TDNetworkMessage) ois.readObject();
+					Object other = ois.readObject();
 					// after reading the object, it sends an update event to the main thread to update the gui
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
+							if(other instanceof TDNetworkMessage) {
+								otherMessage = (TDNetworkMessage) other;
+							} else if (other instanceof ArrayList<?>) {
+								model.setEnemies((ArrayList<Enemy>)other);
+							} else {
+								startRound();
+							}
 							if(otherMessage.getTower() == 0) {
 								image = new Image(new BirdPersonTower().getTowerPic());
 								model.addTower(new BirdPersonTower(), otherMessage.getRow(), otherMessage.getColumn());
@@ -109,6 +117,14 @@ public class TowerDefenseController {
 	public void sendMap(TDNetworkMessage message) {
 		try {
 			oos.writeObject(message);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void sendPlay() {
+		try {
+			oos.writeObject(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

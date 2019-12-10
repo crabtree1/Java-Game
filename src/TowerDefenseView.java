@@ -92,10 +92,12 @@ public class TowerDefenseView extends Application implements Observer {
 					mainMenu.setOnMouseClicked((event2) -> {
 						if (event2.getX() > 75 && event2.getX() < 453 && event2.getY() > 100 && event2.getY() < 611) {
 							controller.setRoad(new Road1());
+							controller.sendMap(new TDNetworkMessage(1));
 						}
 						else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
 							this.roadType = 2;
 							controller.setRoad(new Road2());
+							controller.sendMap(new TDNetworkMessage(2));
 						}
 						startGame();
 					});
@@ -319,6 +321,9 @@ public class TowerDefenseView extends Application implements Observer {
 					temp.setOnMouseClicked(e -> {
 						if (controller.getGamePhase().equals("place")) {
 							controller.startRound();
+							if(!dialogBox.createType()) {
+								controller.sendPlay();
+							}
 						}
 					});
 				} else {
@@ -364,12 +369,6 @@ public class TowerDefenseView extends Application implements Observer {
 		this.controller.initStreams(socket);
 		if(dialogBox.createType()) {
 			controller.listenForMap();
-		} else {
-			if(this.roadType == 1) {
-				controller.sendMap(new TDNetworkMessage(1));
-			} else {
-				controller.sendMap(new TDNetworkMessage(2));
-			}
 		}
 		if(dialogBox.createType()) {
 			controller.startListening();
