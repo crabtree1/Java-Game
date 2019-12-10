@@ -116,7 +116,7 @@ public class TowerDefenseController {
 		this.model.towerAttack();
 	}
 	
-	public Integer getRound() {
+	public int getRound() {
 		return this.model.getRound();
 	}
 }
