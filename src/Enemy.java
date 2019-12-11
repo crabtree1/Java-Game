@@ -1,3 +1,5 @@
+import java.io.Serializable;
+
 /**
  * Class that defines the base behaviors for all enemies in the game. Enemies
  * have health, x and y coordinates, a boolean to determine if they are alive
@@ -5,7 +7,12 @@
  * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
  *
  */
-public class Enemy {
+public class Enemy implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	private int health;
 	private int x;

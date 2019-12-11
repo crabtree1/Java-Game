@@ -12,8 +12,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 
-import javax.print.attribute.standard.MediaSize.Other;
-
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 
@@ -25,7 +23,6 @@ public class TowerDefenseController {
 	private TDNetworkMessage otherMessage;
 	private boolean isTurn = true;
 	private boolean isMultiplayer = false;
-	private boolean isClient = false;
 	private int curTowerType = 0;
 	private Image image = null;
 	
@@ -79,7 +76,9 @@ public class TowerDefenseController {
 								if(other instanceof TDNetworkMessage) {
 									otherMessage = (TDNetworkMessage) other;
 								} else if (other instanceof ArrayList<?>) {
+									System.out.println("Here");
 									model.setEnemies((ArrayList<Enemy>)other);
+									System.out.println(((ArrayList)other).size());
 									return;
 								}
 								if(otherMessage.isPlaying()) {
@@ -250,6 +249,10 @@ public class TowerDefenseController {
 		return model.getRoad();
 	}
 	
+	/**
+	 * Getter to get the tower map at the current point in the model
+	 * @return the 2D array tower map
+	 */
 	public Tower[][] getTowerMap(){
 		return model.getTowerMap();
 	}
@@ -280,6 +283,7 @@ public class TowerDefenseController {
 		if(!isTurn) {
 			return;
 		}
+		// only place a tower if the user can afford it
 		if((getMoney() - currTowerClicked.getCost()) < 0) {
 			return;
 		}
@@ -300,12 +304,25 @@ public class TowerDefenseController {
 				row = i;
 			}
 		}
-		if(!isClient && isMultiplayer) {
+		if (currTowerClicked instanceof BirdPersonTower) {
+			currTowerClicked = new BirdPersonTower();
+		} else if (currTowerClicked instanceof JerryTower) {
+			currTowerClicked = new JerryTower();
+		}else if (currTowerClicked instanceof MeeseeksTower) {
+			currTowerClicked = new MeeseeksTower();
+		}else if (currTowerClicked instanceof MortyTower) {
+			currTowerClicked = new MortyTower();
+		} else if (currTowerClicked instanceof RickTower) {
+			currTowerClicked = new RickTower();
+		} else if (currTowerClicked instanceof SquanchyTower) {
+			currTowerClicked = new SquanchyTower();
+		} 
+		if(!model.isClient() && isMultiplayer) {
 			if(col < 8) {
 				return;
 			}
 				
-		} else if (isClient && isMultiplayer) {
+		} else if (model.isClient() && isMultiplayer) {
 			if(col > 7) {
 				return;
 			}
@@ -346,12 +363,12 @@ public class TowerDefenseController {
 				row = i;
 			}
 		}
-		if(!isClient && isMultiplayer) {
+		if(!model.isClient() && isMultiplayer) {
 			if(col < 8) {
 				return;
 			}
 				
-		} else if (isClient && isMultiplayer) {
+		} else if (model.isClient() && isMultiplayer) {
 			if(col > 7) {
 				return;
 			}
@@ -404,7 +421,7 @@ public class TowerDefenseController {
 	}
 	
 	public void setIsClient(boolean isClient) {
-		this.isClient = isClient;
+		this.model.setClient(isClient);
 	}
 	
 	/**
@@ -449,7 +466,7 @@ public class TowerDefenseController {
 	 * Getter to get the current round of the game
 	 * @return the game's round
 	 */
-	public Integer getRound() {
+	public int getRound() {
 		return this.model.getRound();
 	}
 
@@ -461,5 +478,9 @@ public class TowerDefenseController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Integer getGameSpeed() {
+		return this.model.getGameSpeed();
 	}
 }
