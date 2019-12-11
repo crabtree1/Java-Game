@@ -385,7 +385,7 @@ public class TowerDefenseModel extends Observable{
 								}
 							} else if (towerMap[i][j] instanceof JerryTower && currEnemy
 									instanceof DoofusRickEnemy) {
-								currEnemy.takeDamage(towerMap[i][j].attackPower * 20);
+								currEnemy.takeDamage(100);
 							} else {
 								currEnemy.takeDamage(towerMap[i][j].attackPower);
 								//System.out.println(currEnemy.getHealth());
