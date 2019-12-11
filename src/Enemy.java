@@ -6,8 +6,7 @@
  *
  */
 public class Enemy {
-	
-	private int health;
+
 	private int x;
 	private int y;
 	private boolean alive;
@@ -15,12 +14,13 @@ public class Enemy {
 	protected String towerPic;
 	protected String towerPortrait;
 	protected String towerName;
+	protected int health;
 	
 	/**
 	 * Default constructor for any enemy class
 	 */
 	public Enemy() {
-		this.health = 100;
+		this.health = 10;
 		this.x = 0;
 		this.y = 0;
 		this.alive = true;

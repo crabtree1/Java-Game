@@ -12,7 +12,7 @@ public class JerryTower extends Tower {
 	 */
 	public JerryTower() {
 		super();
-		this.cost = 50;
+		this.cost = 1;
 		this.towerPic = "pictures/jerry.png";
 		this.towerPortrait = "pictures/jerryportrait.png";
 		this.towerName = "pictures/jerryText.png";

@@ -385,16 +385,14 @@ public class TowerDefenseModel extends Observable{
 								}
 							} else if (towerMap[i][j] instanceof JerryTower && currEnemy
 									instanceof DoofusRickEnemy) {
-								currEnemy.takeDamage(towerMap[i][j].attackPower * 2);
+								currEnemy.takeDamage(towerMap[i][j].attackPower * 20);
 							} else {
 								currEnemy.takeDamage(towerMap[i][j].attackPower);
 								//System.out.println(currEnemy.getHealth());
 							}
 						}
-						if((currEnemy.getHealth() < temp) && (currEnemy.getHealth() != 0)) {
-							addAttackMoney();
-						}
 						if (currEnemy.getHealth() <= 0) {
+							addAttackMoney();
 							currEnemy.setAlive(false);
 							enemyMap.remove(currEnemy);
 
