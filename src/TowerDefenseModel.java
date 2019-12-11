@@ -7,8 +7,11 @@
  * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
  */
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.Random;
 
 public class TowerDefenseModel extends Observable{
 
@@ -24,7 +27,11 @@ public class TowerDefenseModel extends Observable{
 	private int[][] pathToFollow;
 	private int round = 1;
 	private int probability = 1;
+	private long seed1;
+	private long seed2;
 	private boolean isClient = false;
+	
+	private ObjectOutputStream oos;
 	
 	/**
 	 * Constructor for the tower defense model
@@ -93,6 +100,18 @@ public class TowerDefenseModel extends Observable{
 			public void run() {
 				int i = 0;
 				while(i < roundEnemies || enemyMap.size() != 0) {
+					if(!isClient) {
+						Random randSeed = new Random();
+						seed1 = randSeed.nextLong();
+						seed2 = randSeed.nextLong();
+						try {
+							oos.writeObject(new TDNetworkMessage(getSeed1(), getSeed2()));
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					Random rand = new Random(seed1);
+					Random rand1 = new Random(seed2);
 					if(getHealth() < 0) {
 						enemyMap = new ArrayList<Enemy>();
 						break;
@@ -100,9 +119,9 @@ public class TowerDefenseModel extends Observable{
 					int speedToSleep = 40;
 					if (!paused) {
 						moveEnemies();
-						int createProb = (int) (Math.random() * 4);
+						int createProb = (int) (rand.nextDouble() * 4);
 						if (createProb < probability && i < roundEnemies) {
-							int randomEnemy = ((int) (Math.random() * 5)) + 1;
+							int randomEnemy = ((int) (rand1.nextDouble() * 5)) + 1;
 							createEnemy(randomEnemy);
 							i += 1;
 						}
@@ -464,5 +483,25 @@ public class TowerDefenseModel extends Observable{
 	
 	public boolean isClient() {
 		return isClient;
+	}
+	
+	public void setSeed1(Long seed1) {
+		this.seed1 = seed1;
+	}
+	
+	public void setSeed2(Long seed2) {
+		this.seed2 = seed2;
+	}
+	
+	public Long getSeed1() {
+		return this.seed1;
+	}
+	
+	public Long getSeed2() {
+		return this.seed2;
+	}
+	
+	public void setOOS(ObjectOutputStream oos) {
+		this.oos = oos;
 	}
 }

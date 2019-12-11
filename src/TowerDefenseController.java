@@ -46,6 +46,7 @@ public class TowerDefenseController {
 		 try {
 			this.oos = new ObjectOutputStream(socket.getOutputStream());
 			this.ois = new ObjectInputStream(socket.getInputStream());
+			model.setOOS(oos);
 		} catch (IOException e) {
 		}
 	}
@@ -88,6 +89,9 @@ public class TowerDefenseController {
 									changePaused();
 								} else if(otherMessage.isRemoving()) {
 									model.removeTowerNetwork(otherMessage.getRow(), otherMessage.getColumn());
+								} else if (otherMessage.getSeed1() != null) {
+									model.setSeed1(otherMessage.getSeed1());
+									model.setSeed2(otherMessage.getSeed2());
 								} else if(otherMessage.getTower() == 0) {
 									image = new Image(new BirdPersonTower().getTowerPic());
 									model.addTower(new BirdPersonTower(), otherMessage.getRow(), otherMessage.getColumn());
@@ -183,9 +187,10 @@ public class TowerDefenseController {
 		}
 	}
 	
-	public void sendEnimies() {
+	public void sendSeeds() {
+		System.out.print("Here1");
 		try {
-			oos.writeObject(model.getEnemies());
+			oos.writeObject(new TDNetworkMessage(model.getSeed1(), model.getSeed2()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -262,7 +267,6 @@ public class TowerDefenseController {
 	 * Method to begin the round in the model
 	 */
 	public void startRound() {
-		System.out.println("Here");
 		model.startRound();
 	}
 	
