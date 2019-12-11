@@ -24,6 +24,8 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import javafx.animation.PathTransition;
 import javafx.application.Application;
@@ -89,6 +91,8 @@ public class TowerDefenseView extends Application implements Observer {
 		
 		stage.setTitle("Rick and Morty Tower Defense");
 		
+		Clip introClip = this.createAudioClip("src/sounds/intro.wav");
+		
 		border = new BorderPane();
 		Rectangle mainMenu = new Rectangle();
 		mainMenu.setWidth(1000);
@@ -100,12 +104,18 @@ public class TowerDefenseView extends Application implements Observer {
 				mainMenu.setFill(new ImagePattern(mapSelection));
 				mainMenu.setOnMouseClicked((event2) -> {
 					if (event2.getX() > 75 && event2.getX() < 453 && event2.getY() > 100 && event2.getY() < 611) {
+						introClip.stop();
 						controller.setRoad(new Road1());
 						startGame();
+						Clip map1Clip = this.createAudioClip("src/sounds/Show me what you got.wav");
+						map1Clip.start();
 					}
 					else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
+						introClip.stop();
 						controller.setRoad(new Road2());
 						startGame();
+						Clip map2Clip = this.createAudioClip("src/sounds/get Schwifty.wav");
+						map2Clip.start();
 					}
 				});
 			}
@@ -117,14 +127,20 @@ public class TowerDefenseView extends Application implements Observer {
 					mainMenu.setFill(new ImagePattern(mapSelection));
 					mainMenu.setOnMouseClicked((event2) -> {
 						if (event2.getX() > 75 && event2.getX() < 453 && event2.getY() > 100 && event2.getY() < 611) {
+							introClip.stop();
 							controller.setRoad(new Road1());
 							controller.sendMap(new TDNetworkMessage(1));
 							startGame();
+							Clip map1Clip = this.createAudioClip("src/sounds/Show me what you got.wav");
+							map1Clip.start();
 						}
 						else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
+							introClip.stop();
 							controller.setRoad(new Road2());
 							controller.sendMap(new TDNetworkMessage(2));
 							startGame();
+							Clip map2Clip = this.createAudioClip("src/sounds/get Schwifty.wav");
+							map2Clip.start();
 						}
 					});
 				}
@@ -147,21 +163,30 @@ public class TowerDefenseView extends Application implements Observer {
 		stage.setScene(scene);
 		stage.show();
 		
-		File audioFile = new File("src/intro.wav");
-		AudioInputStream aio = AudioSystem.getAudioInputStream(audioFile);
-		AudioFormat format = aio.getFormat();
-		DataLine.Info info = new DataLine.Info(Clip.class, format);
-		
-		Clip audioClip = (Clip) AudioSystem.getLine(info);
-		
-		audioClip.open(aio);
-		audioClip.start();
+		introClip.start();
+		introClip.loop(30);
 		
 		//playGame();
 		
 		//AudioInputStream aio = AudioSystem.getAudioInputStream(new File("intro.mp3"));
 		//Clip clip = AudioSystem.getClip();
 		//clip.start();
+	}
+	
+	private Clip createAudioClip(String fileName) {
+		File audioFile = new File(fileName);
+		AudioInputStream aio;
+		Clip audioClip = null;
+		try {
+			aio = AudioSystem.getAudioInputStream(audioFile);
+			AudioFormat format = aio.getFormat();
+			DataLine.Info info = new DataLine.Info(Clip.class, format);
+			audioClip = (Clip) AudioSystem.getLine(info);
+			audioClip.open(aio);
+		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+			e.printStackTrace();
+		}
+		return audioClip;
 	}
 	
 	/**
