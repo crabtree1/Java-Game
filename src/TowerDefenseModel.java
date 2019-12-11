@@ -388,7 +388,6 @@ public class TowerDefenseModel extends Observable{
 								currEnemy.takeDamage(100);
 							} else {
 								currEnemy.takeDamage(towerMap[i][j].attackPower);
-								//System.out.println(currEnemy.getHealth());
 							}
 						}
 						if (currEnemy.getHealth() <= 0) {
