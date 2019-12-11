@@ -196,16 +196,18 @@ public class TowerDefenseModel extends Observable{
 	 * @param e - current enemy to find the next for
 	 */
 	public void findNext(Enemy e) {
+		System.out.println(e.getY());
+		System.out.println(pathToFollow[0][0]);
 		int[] enemyCoords = {e.getX(), e.getY()};
 		for (int i = 0; i < pathToFollow.length - 1; i++) {
-			if (enemyCoords[1] < road.getStartingPos()[1]) {
-				e.setCords(enemyCoords[0], enemyCoords[1] + 1);
-				return;
-			}
-			else if (pathToFollow[i][0] == enemyCoords[0] && pathToFollow[i][1] == enemyCoords[1]) {
+			if (pathToFollow[i][0] == enemyCoords[0] && pathToFollow[i][1] == enemyCoords[1]) {
 				e.setCords(pathToFollow[i+1][0], pathToFollow[i+1][1]);
 				return;
-			}
+			} else if (enemyCoords[1] < road.getStartingPos()[1]) {
+				System.out.println("Here");
+				e.setCords(enemyCoords[0], enemyCoords[1] + 1);
+				return;
+			} 
 		}
 		if(e.getHealth() > 0) {
 			this.health -= e.getHealth();

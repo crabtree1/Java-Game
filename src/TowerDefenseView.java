@@ -10,6 +10,7 @@
  * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -17,6 +18,12 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
 
 import javafx.animation.PathTransition;
 import javafx.application.Application;
@@ -139,6 +146,17 @@ public class TowerDefenseView extends Application implements Observer {
 		Scene scene = new Scene(border, 1000, 727);
 		stage.setScene(scene);
 		stage.show();
+		
+		File audioFile = new File("src/intro.wav");
+		AudioInputStream aio = AudioSystem.getAudioInputStream(audioFile);
+		AudioFormat format = aio.getFormat();
+		DataLine.Info info = new DataLine.Info(Clip.class, format);
+		
+		Clip audioClip = (Clip) AudioSystem.getLine(info);
+		
+		audioClip.open(aio);
+		audioClip.start();
+		
 		//playGame();
 		
 		//AudioInputStream aio = AudioSystem.getAudioInputStream(new File("intro.mp3"));
