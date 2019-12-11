@@ -1,6 +1,6 @@
 /**
  * RickTower is a subclass of Tower. Rick towers are very reliable. When in 
- * danger, Rick Tower will always dole out 1 point of damage to any enemies
+ * danger, Rick Tower will always dole out 3 point of damage to any enemies
  * in its range.
  * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
  *
