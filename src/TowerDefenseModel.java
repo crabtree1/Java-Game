@@ -133,9 +133,6 @@ public class TowerDefenseModel extends Observable{
 	 * @param randomEnemy - specifies the type of enemy to create
 	 */
 	public void createEnemy(int randomEnemy) {
-		if(isClient) {
-			return;
-		}
 		if(health < 0) {
 			return;
 		}
