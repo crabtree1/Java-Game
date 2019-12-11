@@ -223,8 +223,11 @@ public class TowerDefenseController {
 		return this.model.getRound();
 	}
 	
-	
-	public Integer getGameSpeed() {
+	/**
+	 * Getter to return the current game speed of the model
+	 * @return the game speed from the model
+	 */
+	public int getGameSpeed() {
 		return this.model.getGameSpeed();
 	}
 }

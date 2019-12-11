@@ -109,14 +109,26 @@ public class Tower {
 		return this.attackPower;
 	}
 	
+	/**
+	 * Adds an enemy to the list of enemies for the tower to attack
+	 * @param e - enemy to be added to the attack list
+	 */
 	public void addEnemy(Enemy e) {
 		enemiesToAttack.add(e);
 	}
 	
+	/**
+	 * Method to remove all enemies from the tower's attack list
+	 */
 	public void clearEnemies() {
 		enemiesToAttack.clear();
 	}
 	
+	/**
+	 * Getter method to return the list of enemies to attack for the
+	 * given tower
+	 * @return an array list with the enemies
+	 */
 	public ArrayList<Enemy> getEnemiesToAttack() {
 		return enemiesToAttack;
 	}
