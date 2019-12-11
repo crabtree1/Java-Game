@@ -356,7 +356,7 @@ public class TowerDefenseView extends Application implements Observer {
 							if(isMultiplayer) {
 								if(!dialogBox.createType()) {
 									controller.startRound();
-									controller.sendEnimies();
+									//controller.sendEnimies();
 									controller.sendPlay();
 								}
 							} else {

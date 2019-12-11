@@ -82,6 +82,7 @@ public class TowerDefenseController {
 									return;
 								}
 								if(otherMessage.isPlaying()) {
+									System.out.println("Here");
 									startRound();
 								} else if(otherMessage.isPuased()) {
 									changePaused();
@@ -261,6 +262,7 @@ public class TowerDefenseController {
 	 * Method to begin the round in the model
 	 */
 	public void startRound() {
+		System.out.println("Here");
 		model.startRound();
 	}
 	

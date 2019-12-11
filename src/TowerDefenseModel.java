@@ -88,7 +88,6 @@ public class TowerDefenseModel extends Observable{
 	 * towers, the round increases, and the number of enemies in the next round increases.
 	 */
 	public void startRound() {
-		this.createEnemy();
 		gamePhase = "attack";
 		Thread thread = new Thread(){
 			public void run() {
@@ -101,6 +100,12 @@ public class TowerDefenseModel extends Observable{
 					int speedToSleep = 40;
 					if (!paused) {
 						moveEnemies();
+						int createProb = (int) (Math.random() * 4);
+						if (createProb < probability && i < roundEnemies) {
+							int randomEnemy = ((int) (Math.random() * 5)) + 1;
+							createEnemy(randomEnemy);
+							i += 1;
+						}
 						speedToSleep = gameSpeed;
 					}
 					
@@ -127,48 +132,28 @@ public class TowerDefenseModel extends Observable{
 	 * adds this new enemy to the enemy list.
 	 * @param randomEnemy - specifies the type of enemy to create
 	 */
-	public void createEnemy() {
+	public void createEnemy(int randomEnemy) {
 		if(isClient) {
 			return;
-			
 		}
 		if(health < 0) {
 			return;
 		}
 		Enemy enemy = null;
-		int randomEnemy = 1;
-		int y = road.getStartingPos()[1];
-		int i = 0;
-		while (i < roundEnemies) {
-			randomEnemy = 0;
-			int createProb = (int) (Math.random()*4);
-			if (createProb < probability && i < roundEnemies) {
-				randomEnemy = ((int) (Math.random() * 5)) + 1;
-				i += 1;
-			}
-			if (randomEnemy == 1) {
-				enemy = new PickelRickEnemy();
-				enemy.setCords(road.getStartingPos()[0], y);
-				enemyMap.add(enemy);
-			} else if  (randomEnemy == 2){
-				enemy = new ToxicRickEnemy();
-				enemy.setCords(road.getStartingPos()[0], y);
-				enemyMap.add(enemy);
-			} else if (randomEnemy == 3) {
-				enemy  = new DoofusRickEnemy();
-				enemy.setCords(road.getStartingPos()[0], y);
-				enemyMap.add(enemy);
-			} else if (randomEnemy == 4) {
-				enemy = new EvilRickEnemy();
-				enemy.setCords(road.getStartingPos()[0], y);
-				enemyMap.add(enemy);
-			} else if(randomEnemy == 5){
-				enemy = new GuardRickEnemy();
-				enemy.setCords(road.getStartingPos()[0], y);
-				enemyMap.add(enemy);
-			}
-			y --;
+		//int randomEnemy = 1;
+		if (randomEnemy == 1) {
+			enemy = new PickelRickEnemy();
+		} else if  (randomEnemy == 2){
+			enemy = new ToxicRickEnemy();
+		} else if (randomEnemy == 3) {
+			enemy  = new DoofusRickEnemy();
+		} else if (randomEnemy == 4) {
+			enemy = new EvilRickEnemy();
+		} else if(randomEnemy == 5){
+			enemy = new GuardRickEnemy();
 		}
+		enemy.setCords(road.getStartingPos()[0], road.getStartingPos()[1]);
+		enemyMap.add(enemy);
 	}
 	
 	/**
@@ -198,11 +183,7 @@ public class TowerDefenseModel extends Observable{
 	public void findNext(Enemy e) {
 		int[] enemyCoords = {e.getX(), e.getY()};
 		for (int i = 0; i < pathToFollow.length - 1; i++) {
-			if (enemyCoords[1] < road.getStartingPos()[1]) {
-				e.setCords(enemyCoords[0], enemyCoords[1] + 1);
-				return;
-			}
-			else if (pathToFollow[i][0] == enemyCoords[0] && pathToFollow[i][1] == enemyCoords[1]) {
+			if (pathToFollow[i][0] == enemyCoords[0] && pathToFollow[i][1] == enemyCoords[1]) {
 				e.setCords(pathToFollow[i+1][0], pathToFollow[i+1][1]);
 				return;
 			}
