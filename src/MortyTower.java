@@ -1,7 +1,7 @@
 
 /**
  * MortyTower is a subclass of Tower. Morty is a reliable tower, consistently
- * doling out 5 points of damage to any enemy in its range.
+ * doling out 5 points of damage to an enemy in its range.
  * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
  *
  */
