@@ -103,12 +103,14 @@ public class TowerDefenseView extends Application implements Observer {
 				Image mapSelection = new Image("pictures/mapSelection.png");
 				mainMenu.setFill(new ImagePattern(mapSelection));
 				mainMenu.setOnMouseClicked((event2) -> {
+					Clip backgroundMusic = this.createAudioClip("src/sounds/background.wav");
 					if (event2.getX() > 75 && event2.getX() < 453 && event2.getY() > 100 && event2.getY() < 611) {
 						introClip.stop();
 						controller.setRoad(new Road1());
 						startGame();
 						Clip map1Clip = this.createAudioClip("src/sounds/Show me what you got.wav");
 						map1Clip.start();
+						backgroundMusic.start();
 					}
 					else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
 						introClip.stop();
@@ -116,6 +118,7 @@ public class TowerDefenseView extends Application implements Observer {
 						startGame();
 						Clip map2Clip = this.createAudioClip("src/sounds/get Schwifty.wav");
 						map2Clip.start();
+						backgroundMusic.start();
 					}
 				});
 			}
@@ -126,6 +129,7 @@ public class TowerDefenseView extends Application implements Observer {
 					Image mapSelection = new Image("pictures/mapSelection.png");
 					mainMenu.setFill(new ImagePattern(mapSelection));
 					mainMenu.setOnMouseClicked((event2) -> {
+						Clip backgroundMusic = this.createAudioClip("src/sounds/background.wav");
 						if (event2.getX() > 75 && event2.getX() < 453 && event2.getY() > 100 && event2.getY() < 611) {
 							introClip.stop();
 							controller.setRoad(new Road1());
@@ -133,6 +137,7 @@ public class TowerDefenseView extends Application implements Observer {
 							startGame();
 							Clip map1Clip = this.createAudioClip("src/sounds/Show me what you got.wav");
 							map1Clip.start();
+							backgroundMusic.start();
 							model.setNetworked(true);
 						}
 						else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
@@ -142,6 +147,7 @@ public class TowerDefenseView extends Application implements Observer {
 							startGame();
 							Clip map2Clip = this.createAudioClip("src/sounds/get Schwifty.wav");
 							map2Clip.start();
+							backgroundMusic.start();
 							model.setNetworked(true);
 						}
 					});
@@ -358,6 +364,13 @@ public class TowerDefenseView extends Application implements Observer {
 					} else {
 						if (currTowerClicked != null) {
 							controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY());
+							if(currTowerClicked instanceof MeeseeksTower) {
+								Clip meeseeks = this.createAudioClip("src/sounds/Meeseeks.wav");
+								meeseeks.start();
+							} else if (currTowerClicked instanceof SquanchyTower) {
+								Clip squanchy = this.createAudioClip("src/sounds/Squanchy.wav");
+								squanchy.start();
+							}
 						}
 						
 					}

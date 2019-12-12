@@ -491,7 +491,7 @@ public class TowerDefenseController {
 	 * Getter to return the current game speed of the model
 	 * @return the game speed from the model
 	 */
-public int getGameSpeed() {
+	public int getGameSpeed() {
 		return this.model.getGameSpeed();
 	}
 }
