@@ -30,6 +30,7 @@ public class TowerDefenseModel extends Observable{
 	private long seed1;
 	private long seed2;
 	private boolean isClient = false;
+	private boolean isNetworked = false;
 	
 	private ObjectOutputStream oos;
 	
@@ -104,10 +105,12 @@ public class TowerDefenseModel extends Observable{
 						Random randSeed = new Random();
 						seed1 = randSeed.nextLong();
 						seed2 = randSeed.nextLong();
-						try {
-							oos.writeObject(new TDNetworkMessage(getSeed1(), getSeed2()));
-						} catch (IOException e) {
-							e.printStackTrace();
+						if(isNetworked) {
+							try {
+								oos.writeObject(new TDNetworkMessage(getSeed1(), getSeed2()));
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
 						}
 					}
 					Random rand = new Random(seed1);
@@ -343,6 +346,7 @@ public class TowerDefenseModel extends Observable{
 		//Tower[][] towers = controller.getTowerMap();
 		for (int i = 0; i < towerMap.length; i ++) {
 			for (int j = 0; j < towerMap[i].length; j ++) {
+				int enemiesHit = 0;
 				for (int k = 0; k < enemyMap.size(); k ++) {
 					Enemy currEnemy = enemyMap.get(k);
 					if (towerMap[i][j] != null) {
@@ -350,8 +354,7 @@ public class TowerDefenseModel extends Observable{
 						hasEnemy = false;
 						if (towerMap[i][j] instanceof BirdPersonTower) {
 							currEnemy.takeDamage(1);
-							//System.out.println(currEnemy.getHealth());
-							
+							towerMap[i][j].addEnemy(currEnemy);
 						} 
 						//below
 						else if (currEnemy.getX() == i + 1 && currEnemy.getY() == j) {
@@ -395,6 +398,7 @@ public class TowerDefenseModel extends Observable{
 						}
 							
 						if (hasEnemy) {
+							enemiesHit ++;
 							//System.out.println(towers[i][j].attackPower);
 								
 							if (towerMap[i][j] instanceof MeeseeksTower) {
@@ -413,20 +417,22 @@ public class TowerDefenseModel extends Observable{
 								}
 							} else if (towerMap[i][j] instanceof JerryTower && currEnemy
 									instanceof DoofusRickEnemy) {
-								currEnemy.takeDamage(towerMap[i][j].attackPower * 2);
+								currEnemy.takeDamage(100);
 							} else {
 								currEnemy.takeDamage(towerMap[i][j].attackPower);
-								//System.out.println(currEnemy.getHealth());
 							}
 						}
-						if((currEnemy.getHealth() < temp) && (currEnemy.getHealth() != 0)) {
-							addAttackMoney();
-						}
 						if (currEnemy.getHealth() <= 0) {
+							addAttackMoney();
 							currEnemy.setAlive(false);
 							enemyMap.remove(currEnemy);
 
 						}
+					}
+					// if it is not a rick tower and the tower has attacked the farthest
+					// enemy ahead, break from the enemy loop
+					if (!(towerMap[i][j] instanceof RickTower) && enemiesHit == 1) {
+						break;
 					}
 				}
 			}
@@ -503,5 +509,9 @@ public class TowerDefenseModel extends Observable{
 	
 	public void setOOS(ObjectOutputStream oos) {
 		this.oos = oos;
+	}
+	
+	public void setNetworked(boolean isNetworked) {
+		this.isNetworked = isNetworked;
 	}
 }

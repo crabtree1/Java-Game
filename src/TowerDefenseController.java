@@ -310,6 +310,7 @@ public class TowerDefenseController {
 				row = i;
 			}
 		}
+		
 		if (currTowerClicked instanceof BirdPersonTower) {
 			currTowerClicked = new BirdPersonTower();
 		} else if (currTowerClicked instanceof JerryTower) {
@@ -486,7 +487,11 @@ public class TowerDefenseController {
 		}
 	}
 	
-	public Integer getGameSpeed() {
+	/**
+	 * Getter to return the current game speed of the model
+	 * @return the game speed from the model
+	 */
+public int getGameSpeed() {
 		return this.model.getGameSpeed();
 	}
 }

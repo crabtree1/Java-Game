@@ -94,7 +94,7 @@ public class TowerDefenseTests {
 		Road1 road = new Road1();
 		model1.setRoad(road);
 		con.addTower(tower, 0, 0);
-		assertEquals(model1.getTowerAtPost(0, 0), tower);
+		assertFalse(model1.getTowerAtPost(0, 0) == null);
 	}
 	
 	@Test
@@ -299,7 +299,7 @@ public class TowerDefenseTests {
 		ArrayList<Enemy> enemies = model1.getEnemies();
 		int healthBefore = enemies.get(0).getHealth();
 		con.towerAttack(); // uses random, cannot fully check
-		assertNotEquals(enemies.get(0).getHealth(), healthBefore);
+		assertTrue(enemies.size() == 0 || enemies.get(0).getHealth() != healthBefore);
 	}
 	
 	@Test
@@ -329,9 +329,8 @@ public class TowerDefenseTests {
 		model1.createEnemy(3);
 		model1.moveEnemies();
 		ArrayList<Enemy> enemies = model1.getEnemies();
-		int healthBefore = enemies.get(0).getHealth();
 		con.towerAttack();
-		assertNotEquals(enemies.get(0).getHealth(), healthBefore);
+		assertEquals(enemies.size(), 0);
 	}
 	
 	@Test
@@ -342,7 +341,7 @@ public class TowerDefenseTests {
 		Road1 road = new Road1();
 		model1.setRoad(road);
 		model1.addTower(tower, 0, 14);
-		model1.createEnemy(3);
+		model1.createEnemy(1);
 		model1.moveEnemies();
 		ArrayList<Enemy> enemies = model1.getEnemies();
 		con.towerAttack();
@@ -465,7 +464,11 @@ public class TowerDefenseTests {
 	@Test
 	void testGuardRick() {
 		GuardRickEnemy rick = new GuardRickEnemy();
-		rick.takeDamage(5); // uses random, cannot fully test
+		rick.takeDamage(5); // uses random, call repeatedly to test
+		rick.takeDamage(5);
+		rick.takeDamage(5);
+		rick.takeDamage(5); 
+
 		assertNotEquals(rick, null);
 	}
 	
@@ -509,6 +512,180 @@ public class TowerDefenseTests {
 	void testGetRoad2Val() {
 		Road2 road = new Road2();
 		assertEquals(road.getValAtPos(0, 0), 0);
+	}
+	
+	@Test
+	void testGetGameSpeed() {
+		TowerDefenseModel model1 = new TowerDefenseModel();
+		TowerDefenseController con = new TowerDefenseController(model1);
+		assertEquals(con.getGameSpeed(), 120);
+	}
+	
+	@Test
+	void testAddBirdPerson() {
+		TowerDefenseModel model1 = new TowerDefenseModel();
+		TowerDefenseController con = new TowerDefenseController(model1);
+		Road1 road = new Road1();
+		model1.setRoad(road);
+		BirdPersonTower tower = new BirdPersonTower();
+		con.addTower(tower, 0, 0);
+		assertTrue(model1.towerAtPosition(0, 0));
+	}
+	
+	@Test
+	void testAddJerry() {
+		TowerDefenseModel model1 = new TowerDefenseModel();
+		TowerDefenseController con = new TowerDefenseController(model1);
+		Road1 road = new Road1();
+		model1.setRoad(road);
+		JerryTower tower = new JerryTower();
+		con.addTower(tower, 0, 0);
+		assertTrue(model1.towerAtPosition(0,0));
+	}
+	
+	@Test
+	void testAddMeeseeks() {
+		TowerDefenseModel model1 = new TowerDefenseModel();
+		TowerDefenseController con = new TowerDefenseController(model1);
+		Road1 road = new Road1();
+		model1.setRoad(road);
+		MeeseeksTower tower = new MeeseeksTower();
+		con.addTower(tower, 0, 0);
+		assertTrue(model1.towerAtPosition(0,0));
+	}
+	
+	@Test
+	void testAddMorty() {
+		TowerDefenseModel model1 = new TowerDefenseModel();
+		TowerDefenseController con = new TowerDefenseController(model1);
+		Road1 road = new Road1();
+		model1.setRoad(road);
+		MortyTower tower = new MortyTower();
+		con.addTower(tower, 0, 0);
+		assertTrue(model1.towerAtPosition(0,0));
+	}
+	
+	@Test
+	void testAddRick() {
+		TowerDefenseModel model1 = new TowerDefenseModel();
+		TowerDefenseController con = new TowerDefenseController(model1);
+		Road1 road = new Road1();
+		model1.setRoad(road);
+		RickTower tower = new RickTower();
+		con.addTower(tower, 0, 0);
+		assertTrue(model1.towerAtPosition(0,0));
+	}
+	
+	@Test
+	void testAddSquanch() {
+		TowerDefenseModel model1 = new TowerDefenseModel();
+		TowerDefenseController con = new TowerDefenseController(model1);
+		Road1 road = new Road1();
+		model1.setRoad(road);
+		SquanchyTower tower = new SquanchyTower();
+		con.addTower(tower, 0, 0);
+		assertTrue(model1.towerAtPosition(0,0));
+	}
+	
+	@Test
+	void testAddEnemyToTowerAttackList() {
+		Tower tower = new Tower();
+		Enemy enemy = new Enemy();
+		tower.addEnemy(enemy);
+		assertEquals(tower.getEnemiesToAttack().size(), 1);
+	}
+	
+	@Test
+	void testClearEnemiesToTowerAttackList() {
+		Tower tower = new Tower();
+		Enemy enemy = new Enemy();
+		tower.addEnemy(enemy);
+		tower.clearEnemies();
+		assertEquals(tower.getEnemiesToAttack().size(), 0);
+	}
+	
+	@Test
+	void testEnemyBelow() {
+		TowerDefenseModel model1 = new TowerDefenseModel();
+		TowerDefenseController con = new TowerDefenseController(model1);
+		Road1 road = new Road1();
+		model1.setRoad(road);
+		RickTower tower = new RickTower();
+		model1.createEnemy(1);
+		model1.addTower(tower, 0, 11);
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.towerAttack();
+		assertEquals(tower.getEnemiesToAttack().size(), 1);
+	}
+	
+	@Test
+	void testEnemyAbove() {
+		TowerDefenseModel model1 = new TowerDefenseModel();
+		TowerDefenseController con = new TowerDefenseController(model1);
+		Road1 road = new Road1();
+		model1.setRoad(road);
+		RickTower tower = new RickTower();
+		model1.createEnemy(1);
+		model1.addTower(tower, 4, 13);
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.towerAttack();
+		assertEquals(tower.getEnemiesToAttack().size(), 1);
+	}
+	
+	@Test
+	void testEnemyLowerRightDiagonal() {
+		TowerDefenseModel model1 = new TowerDefenseModel();
+		TowerDefenseController con = new TowerDefenseController(model1);
+		Road1 road = new Road1();
+		model1.setRoad(road);
+		RickTower tower = new RickTower();
+		model1.createEnemy(1);
+		model1.addTower(tower, 2, 12);
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.towerAttack();
+		assertEquals(tower.getEnemiesToAttack().size(), 1);
+	}
+	
+	@Test
+	void testEnemyUpperLeftDiagonal() {
+		TowerDefenseModel model1 = new TowerDefenseModel();
+		TowerDefenseController con = new TowerDefenseController(model1);
+		Road1 road = new Road1();
+		model1.setRoad(road);
+		RickTower tower = new RickTower();
+		model1.createEnemy(1);
+		model1.addTower(tower, 4, 14);
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.towerAttack();
+		assertEquals(tower.getEnemiesToAttack().size(), 1);
+	}
+	
+	@Test
+	void testEnemyUpperRightDiagonal() {
+		TowerDefenseModel model1 = new TowerDefenseModel();
+		TowerDefenseController con = new TowerDefenseController(model1);
+		Road1 road = new Road1();
+		model1.setRoad(road);
+		RickTower tower = new RickTower();
+		model1.createEnemy(1);
+		model1.addTower(tower, 4, 12);
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.moveEnemies();
+		model1.towerAttack();
+		assertEquals(tower.getEnemiesToAttack().size(), 1);
 	}
 }
 
