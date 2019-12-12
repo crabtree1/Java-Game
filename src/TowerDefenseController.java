@@ -25,6 +25,7 @@ public class TowerDefenseController {
 	private boolean isMultiplayer = false;
 	private int curTowerType = 0;
 	private Image image = null;
+	private int NUMBER_OF_ROUNDS = 11;
 	
 	/**
 	 * Constructor for the controller class
@@ -288,10 +289,9 @@ public class TowerDefenseController {
 		
 		int lb;
 		int ub;
-		
 		for (int i = 0; i < 15; i++) {
-			lb = 47 * i;
-			ub = 47 * (i + 1);
+			lb = 47 * i + 15;
+			ub = 47 * (i + 1) + 15;
 			if (mouseX >= lb && mouseX < ub) {
 				col = i;
 			}
@@ -324,15 +324,20 @@ public class TowerDefenseController {
 				return false;
 			}
 		}
-		this.model.spendMoney(currTowerClicked.getCost());
-		model.addTower(currTowerClicked, row, col);
-		if(isMultiplayer) {
-			try {
-				oos.writeObject(new TDNetworkMessage(row, col, curTowerType));
-			} catch (IOException e) {
-				e.printStackTrace();
+		
+		
+		int[][] road = model.getRoad().getMap();
+		if (road[row][col] == 0 && model.towerAtPosition(row, col) == false && model.getGamePhase().equals("place")){
+			this.model.spendMoney(currTowerClicked.getCost());
+			model.addTower(currTowerClicked, row, col);
+			if(isMultiplayer) {
+				try {
+					oos.writeObject(new TDNetworkMessage(row, col, curTowerType));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				this.isTurn = false;
 			}
-			this.isTurn = false;
 		}
 	return true;
 	}

@@ -100,7 +100,7 @@ public class TowerDefenseModel extends Observable{
 		Thread thread = new Thread(){
 			public void run() {
 				int i = 0;
-				while(i < roundEnemies || enemyMap.size() != 0) {
+				while(i < roundEnemies || enemyMap.size() != 0 || health <= 0) {
 					if(!isClient) {
 						Random randSeed = new Random();
 						seed1 = randSeed.nextLong();
@@ -130,7 +130,6 @@ public class TowerDefenseModel extends Observable{
 						}
 						speedToSleep = gameSpeed;
 					}
-					
 					try {
 						Thread.sleep(speedToSleep);
 					} catch (InterruptedException e) {
@@ -181,11 +180,39 @@ public class TowerDefenseModel extends Observable{
 	 */
 	public void moveEnemies() {
 		if (health > 0) {
+			/*
+			int i = 0;
+			while (i < enemyMap.size()) {
+				System.out.println("i am in while loop");
+				Enemy e = enemyMap.get(i);
+				System.out.println(e);
+				if (e != null) {
+					boolean didRemove = false;
+					if (e.getAlive()) {
+						didRemove = findNext(e);
+					}
+					
+					if (!didRemove) {
+						i+=1;
+					}
+				}
+			}
+			*/
+			ArrayList<Enemy> toRemove = new ArrayList<Enemy>();
 			for (int i = 0; i < enemyMap.size(); i++) {
 				Enemy e = enemyMap.get(i);
+				boolean remove = false;
 				if (e.getAlive()) {
-					findNext(e);
+					remove = findNext(e);
+					
 				}
+				
+				if (remove) {
+					toRemove.add(e);
+				}
+			}
+			for (int i = 0; i < toRemove.size(); i++) {
+				enemyMap.remove(toRemove.get(i));
 			}
 			
 			setChanged();
@@ -198,19 +225,21 @@ public class TowerDefenseModel extends Observable{
 	 * The enemies will continue to find a new next until they
 	 * are dead or have reached the end of the board
 	 * @param e - current enemy to find the next for
+	 * @return true if a value was removed false otherwise.
 	 */
-	public void findNext(Enemy e) {
+	public boolean findNext(Enemy e) {
 		int[] enemyCoords = {e.getX(), e.getY()};
 		for (int i = 0; i < pathToFollow.length - 1; i++) {
 			if (pathToFollow[i][0] == enemyCoords[0] && pathToFollow[i][1] == enemyCoords[1]) {
 				e.setCords(pathToFollow[i+1][0], pathToFollow[i+1][1]);
-				return;
+				return false;
 			} 
 		}
 		if(e.getHealth() > 0) {
 			this.health -= e.getHealth();
 		}
-		enemyMap.remove(e);
+		//enemyMap.remove(e);
+		return true;
 	}
 	
 	/**
@@ -347,6 +376,7 @@ public class TowerDefenseModel extends Observable{
 	 */
 	public void towerAttack() {
 		boolean hasEnemy;
+		ArrayList<Enemy> toRemove = new ArrayList<Enemy>();
 		//Tower[][] towers = controller.getTowerMap();
 		for (int i = 0; i < towerMap.length; i ++) {
 			for (int j = 0; j < towerMap[i].length; j ++) {
@@ -428,8 +458,7 @@ public class TowerDefenseModel extends Observable{
 						if (currEnemy.getHealth() <= 0) {
 							addAttackMoney();
 							currEnemy.setAlive(false);
-							enemyMap.remove(currEnemy);
-
+							toRemove.add(currEnemy);
 						}
 					}
 					// if it is not a rick tower and the tower has attacked the farthest
@@ -440,6 +469,10 @@ public class TowerDefenseModel extends Observable{
 				}
 			}
 		}
+		for (int i = 0; i < toRemove.size(); i++) {
+			enemyMap.remove(toRemove.get(i));
+		}
+		
 	}
 	
 	/**
