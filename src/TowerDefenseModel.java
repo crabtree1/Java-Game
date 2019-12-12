@@ -100,7 +100,7 @@ public class TowerDefenseModel extends Observable{
 		Thread thread = new Thread(){
 			public void run() {
 				int i = 0;
-				while(i < roundEnemies || enemyMap.size() != 0) {
+				while(i < roundEnemies || enemyMap.size() != 0 || health <= 0) {
 					if(!isClient) {
 						Random randSeed = new Random();
 						seed1 = randSeed.nextLong();
@@ -130,7 +130,6 @@ public class TowerDefenseModel extends Observable{
 						}
 						speedToSleep = gameSpeed;
 					}
-					
 					try {
 						Thread.sleep(speedToSleep);
 					} catch (InterruptedException e) {
@@ -181,13 +180,26 @@ public class TowerDefenseModel extends Observable{
 	 */
 	public void moveEnemies() {
 		if (health > 0) {
+			int i = 0;
+			while (i < enemyMap.size()) {
+				Enemy e = enemyMap.get(i);
+				boolean didRemove = false;
+				if (e.getAlive()) {
+					didRemove = findNext(e);
+				}
+				
+				if (!didRemove) {
+					i+=1;
+				}
+			}
+			/*
 			for (int i = 0; i < enemyMap.size(); i++) {
 				Enemy e = enemyMap.get(i);
 				if (e.getAlive()) {
 					findNext(e);
 				}
 			}
-			
+			*/
 			setChanged();
 			notifyObservers(enemyMap);
 		}
@@ -199,18 +211,19 @@ public class TowerDefenseModel extends Observable{
 	 * are dead or have reached the end of the board
 	 * @param e - current enemy to find the next for
 	 */
-	public void findNext(Enemy e) {
+	public boolean findNext(Enemy e) {
 		int[] enemyCoords = {e.getX(), e.getY()};
 		for (int i = 0; i < pathToFollow.length - 1; i++) {
 			if (pathToFollow[i][0] == enemyCoords[0] && pathToFollow[i][1] == enemyCoords[1]) {
 				e.setCords(pathToFollow[i+1][0], pathToFollow[i+1][1]);
-				return;
+				return false;
 			} 
 		}
 		if(e.getHealth() > 0) {
 			this.health -= e.getHealth();
 		}
 		enemyMap.remove(e);
+		return true;
 	}
 	
 	/**

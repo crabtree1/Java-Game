@@ -574,7 +574,7 @@ public class TowerDefenseView extends Application implements Observer {
 		// allow them to place towers and update the gui accordingly
 		if (controller.getGamePhase().equals("place")) {
 			if (arg == null) {
-				if (controller.getRound() == 3) {
+				if (controller.getRound() == 10) {
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {

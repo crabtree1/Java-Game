@@ -327,15 +327,20 @@ public class TowerDefenseController {
 				return;
 			}
 		}
-		this.model.spendMoney(currTowerClicked.getCost());
-		model.addTower(currTowerClicked, row, col);
-		if(isMultiplayer) {
-			try {
-				oos.writeObject(new TDNetworkMessage(row, col, curTowerType));
-			} catch (IOException e) {
-				e.printStackTrace();
+		
+		
+		int[][] road = model.getRoad().getMap();
+		if (road[row][col] == 0 && model.towerAtPosition(row, col) == false && model.getGamePhase().equals("place")){
+			this.model.spendMoney(currTowerClicked.getCost());
+			model.addTower(currTowerClicked, row, col);
+			if(isMultiplayer) {
+				try {
+					oos.writeObject(new TDNetworkMessage(row, col, curTowerType));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				this.isTurn = false;
 			}
-			this.isTurn = false;
 		}
 	}
 	
