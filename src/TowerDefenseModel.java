@@ -180,26 +180,41 @@ public class TowerDefenseModel extends Observable{
 	 */
 	public void moveEnemies() {
 		if (health > 0) {
+			/*
 			int i = 0;
 			while (i < enemyMap.size()) {
+				System.out.println("i am in while loop");
 				Enemy e = enemyMap.get(i);
-				boolean didRemove = false;
-				if (e.getAlive()) {
-					didRemove = findNext(e);
-				}
-				
-				if (!didRemove) {
-					i+=1;
-				}
-			}
-			/*
-			for (int i = 0; i < enemyMap.size(); i++) {
-				Enemy e = enemyMap.get(i);
-				if (e.getAlive()) {
-					findNext(e);
+				System.out.println(e);
+				if (e != null) {
+					boolean didRemove = false;
+					if (e.getAlive()) {
+						didRemove = findNext(e);
+					}
+					
+					if (!didRemove) {
+						i+=1;
+					}
 				}
 			}
 			*/
+			ArrayList<Enemy> toRemove = new ArrayList<Enemy>();
+			for (int i = 0; i < enemyMap.size(); i++) {
+				Enemy e = enemyMap.get(i);
+				boolean remove = false;
+				if (e.getAlive()) {
+					remove = findNext(e);
+					
+				}
+				
+				if (remove) {
+					toRemove.add(e);
+				}
+			}
+			for (int i = 0; i < toRemove.size(); i++) {
+				enemyMap.remove(toRemove.get(i));
+			}
+			
 			setChanged();
 			notifyObservers(enemyMap);
 		}
@@ -210,6 +225,7 @@ public class TowerDefenseModel extends Observable{
 	 * The enemies will continue to find a new next until they
 	 * are dead or have reached the end of the board
 	 * @param e - current enemy to find the next for
+	 * @return true if a value was removed false otherwise.
 	 */
 	public boolean findNext(Enemy e) {
 		int[] enemyCoords = {e.getX(), e.getY()};
@@ -222,7 +238,7 @@ public class TowerDefenseModel extends Observable{
 		if(e.getHealth() > 0) {
 			this.health -= e.getHealth();
 		}
-		enemyMap.remove(e);
+		//enemyMap.remove(e);
 		return true;
 	}
 	
@@ -355,6 +371,7 @@ public class TowerDefenseModel extends Observable{
 	 */
 	public void towerAttack() {
 		boolean hasEnemy;
+		ArrayList<Enemy> toRemove = new ArrayList<Enemy>();
 		//Tower[][] towers = controller.getTowerMap();
 		for (int i = 0; i < towerMap.length; i ++) {
 			for (int j = 0; j < towerMap[i].length; j ++) {
@@ -436,8 +453,7 @@ public class TowerDefenseModel extends Observable{
 						if (currEnemy.getHealth() <= 0) {
 							addAttackMoney();
 							currEnemy.setAlive(false);
-							enemyMap.remove(currEnemy);
-
+							toRemove.add(currEnemy);
 						}
 					}
 					// if it is not a rick tower and the tower has attacked the farthest
@@ -448,6 +464,10 @@ public class TowerDefenseModel extends Observable{
 				}
 			}
 		}
+		for (int i = 0; i < toRemove.size(); i++) {
+			enemyMap.remove(toRemove.get(i));
+		}
+		
 	}
 	
 	/**

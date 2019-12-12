@@ -63,6 +63,7 @@ import javafx.util.Duration;
 public class TowerDefenseView extends Application implements Observer {
 	
 
+	private static final int NUMBER_OF_ROUNDS = 11;
 	private TowerDefenseModel model;
 	private TowerDefenseController controller;
 	private BorderPane border;
@@ -533,6 +534,7 @@ public class TowerDefenseView extends Application implements Observer {
 		if(option.get() == newGame) {
 			try {
 				start(stage);
+				currTowerClicked = null;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -574,7 +576,7 @@ public class TowerDefenseView extends Application implements Observer {
 		// allow them to place towers and update the gui accordingly
 		if (controller.getGamePhase().equals("place")) {
 			if (arg == null) {
-				if (controller.getRound() == 10) {
+				if (controller.getRound() == NUMBER_OF_ROUNDS) {
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
