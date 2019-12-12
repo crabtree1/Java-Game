@@ -19,7 +19,7 @@ public class TowerDefenseModel extends Observable{
 	private ArrayList<Enemy> enemyMap;
 	private Road road;
 	private int health = 100;
-	private int money = 100;
+	private int money = 30;
 	private int gameSpeed = 120;
 	private boolean paused = false;
 	private String gamePhase;

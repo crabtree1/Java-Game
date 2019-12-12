@@ -324,8 +324,6 @@ public class TowerDefenseController {
 				return false;
 			}
 		}
-		
-		
 		int[][] road = model.getRoad().getMap();
 		if (road[row][col] == 0 && model.towerAtPosition(row, col) == false && model.getGamePhase().equals("place")){
 			this.model.spendMoney(currTowerClicked.getCost());
