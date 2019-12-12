@@ -337,9 +337,10 @@ public class TowerDefenseController {
 					e.printStackTrace();
 				}
 				this.isTurn = false;
+				return true;
 			}
 		}
-	return true;
+	return false;
 	}
 	
 	/**

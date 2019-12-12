@@ -377,27 +377,28 @@ public class TowerDefenseView extends Application implements Observer {
 						temp.setFill(new ImagePattern(pic));
 					} else {
 						if (currTowerClicked != null) {
-							if(!controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY())) {
+							if(controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY())) {
 								return;
-							}
-							if(currTowerClicked instanceof MeeseeksTower) {
-								Clip meeseeks = this.createAudioClip("src/sounds/Meeseeks.wav");
-								meeseeks.start();
-							} else if (currTowerClicked instanceof SquanchyTower) {
-								Clip squanchy = this.createAudioClip("src/sounds/Squanchy.wav");
-								squanchy.start();
-							} else if (currTowerClicked instanceof RickTower) {
-								Clip rick = this.createAudioClip("src/sounds/Rick.wav");
-								rick.start();
-							} else if (currTowerClicked instanceof MortyTower) {
-								Clip morty = this.createAudioClip("src/sounds/Morty.wav");
-								morty.start();
-							} else if (currTowerClicked instanceof JerryTower) {
-								Clip jerry = this.createAudioClip("src/sounds/Jerry.wav");
-								jerry.start();
-							} else if (currTowerClicked instanceof BirdPersonTower) {
-								Clip birdperson = this.createAudioClip("src/sounds/Birdperson.wav");
-								birdperson.start();
+							} else {
+								if(currTowerClicked instanceof MeeseeksTower) {
+									Clip meeseeks = this.createAudioClip("src/sounds/Meeseeks.wav");
+									meeseeks.start();
+								} else if (currTowerClicked instanceof SquanchyTower) {
+									Clip squanchy = this.createAudioClip("src/sounds/Squanchy.wav");
+									squanchy.start();
+								} else if (currTowerClicked instanceof RickTower) {
+									Clip rick = this.createAudioClip("src/sounds/Rick.wav");
+									rick.start();
+								} else if (currTowerClicked instanceof MortyTower) {
+									Clip morty = this.createAudioClip("src/sounds/Morty.wav");
+									morty.start();
+								} else if (currTowerClicked instanceof JerryTower) {
+									Clip jerry = this.createAudioClip("src/sounds/Jerry.wav");
+									jerry.start();
+								} else if (currTowerClicked instanceof BirdPersonTower) {
+									Clip birdperson = this.createAudioClip("src/sounds/Birdperson.wav");
+									birdperson.start();
+								}
 							}
 						}
 						
