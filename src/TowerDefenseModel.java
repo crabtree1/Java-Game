@@ -287,6 +287,11 @@ public class TowerDefenseModel extends Observable{
 		notifyObservers(returnArray);
 	}
 	
+	/** 
+	 * This method removes towers from the other game in a networked game
+	 * @param x An int of the x value of the tower
+	 * @param y An int of the y value of the tower
+	 */
 	public void removeTowerNetwork(int x, int y) {
 		towerMap[x][y] = null;
 		//this.money += currTowerClicked.getCost()/2;
@@ -477,38 +482,66 @@ public class TowerDefenseModel extends Observable{
 		this.health = amount;
 	}
 	
-	public void setEnemies(ArrayList<Enemy> enemyMap) {
-		this.enemyMap = enemyMap;
-	}
-	
+	/**
+	 * This method sets a boolean indicating if the game is a client
+	 * @param isClient A boolean indicating if the game is a client
+	 */
 	public void setClient(boolean isClient) {
 		this.isClient = isClient;
 	}
 	
+	/**
+	 * This method returns a boolean indicating if the game is a client
+	 * @return A boolean indicating if the game is a client
+	 */
 	public boolean isClient() {
 		return isClient;
 	}
 	
+	/**
+	 * This method sets seed1 for the enemy generation
+	 * @param seed1 A long used to set the seed of the generation
+	 */
 	public void setSeed1(Long seed1) {
 		this.seed1 = seed1;
 	}
 	
+	/**
+	 * This method sets seed2 for the enemy generation
+	 * @param seed2 A long used to set the seed of the generation
+	 */
 	public void setSeed2(Long seed2) {
 		this.seed2 = seed2;
 	}
 	
+	/**
+	 * This method gets the seed1 used for seeding the enemy generator
+	 * @return A long of the seed
+	 */
 	public Long getSeed1() {
 		return this.seed1;
 	}
 	
+	/**
+	 * This method gets the seed2 used for seeding the enemy generator
+	 * @return A long of the seed
+	 */
 	public Long getSeed2() {
 		return this.seed2;
 	}
 	
+	/**
+	 * This method sets the ObjectOutputStream used to send the seeds to the client
+	 * @param oos An ObjectOutputStream object
+	 */
 	public void setOOS(ObjectOutputStream oos) {
 		this.oos = oos;
 	}
 	
+	/**
+	 * This method sets a boolean indicating if the game is networked
+	 * @param isNetworked A boolean indicating if the game is networked
+	 */
 	public void setNetworked(boolean isNetworked) {
 		this.isNetworked = isNetworked;
 	}

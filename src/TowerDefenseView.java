@@ -98,6 +98,7 @@ public class TowerDefenseView extends Application implements Observer {
 		Rectangle mainMenu = new Rectangle();
 		mainMenu.setWidth(1000);
 		mainMenu.setHeight(727);
+		// if the user selects a single player game, create a single player game 
 		mainMenu.setOnMouseClicked((event) -> {
 			if (event.getX() > 45 && event.getX() < 380 && event.getY() > 350 && event.getY() < 411) {
 				isMultiplayer = false;
@@ -105,6 +106,7 @@ public class TowerDefenseView extends Application implements Observer {
 				mainMenu.setFill(new ImagePattern(mapSelection));
 				mainMenu.setOnMouseClicked((event2) -> {
 					Clip backgroundMusic = this.createAudioClip("src/sounds/background.wav");
+					// map 1
 					if (event2.getX() > 75 && event2.getX() < 453 && event2.getY() > 100 && event2.getY() < 611) {
 						introClip.stop();
 						controller.setRoad(new Road1());
@@ -112,7 +114,9 @@ public class TowerDefenseView extends Application implements Observer {
 						Clip map1Clip = this.createAudioClip("src/sounds/Show me what you got.wav");
 						map1Clip.start();
 						backgroundMusic.start();
+						backgroundMusic.loop(20);
 					}
+					// map 2
 					else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
 						introClip.stop();
 						controller.setRoad(new Road2());
@@ -120,10 +124,12 @@ public class TowerDefenseView extends Application implements Observer {
 						Clip map2Clip = this.createAudioClip("src/sounds/get Schwifty.wav");
 						map2Clip.start();
 						backgroundMusic.start();
+						backgroundMusic.loop(20);
 					}
 				});
 			}
-		
+	
+			// if the user selects a multiplayer game, create a multiplayer game
 			else if (event.getX() > 40 && event.getX() < 336 && event.getY() > 455 && event.getY() < 520 ) {
 				dialogBox = new TwoPlayerDialogBox();
 				if(!dialogBox.createType()) {
@@ -131,6 +137,7 @@ public class TowerDefenseView extends Application implements Observer {
 					mainMenu.setFill(new ImagePattern(mapSelection));
 					mainMenu.setOnMouseClicked((event2) -> {
 						Clip backgroundMusic = this.createAudioClip("src/sounds/background.wav");
+						// map 1
 						if (event2.getX() > 75 && event2.getX() < 453 && event2.getY() > 100 && event2.getY() < 611) {
 							introClip.stop();
 							controller.setRoad(new Road1());
@@ -139,8 +146,10 @@ public class TowerDefenseView extends Application implements Observer {
 							Clip map1Clip = this.createAudioClip("src/sounds/Show me what you got.wav");
 							map1Clip.start();
 							backgroundMusic.start();
+							backgroundMusic.loop(20);
 							model.setNetworked(true);
 						}
+						// map 2
 						else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
 							introClip.stop();
 							controller.setRoad(new Road2());
@@ -149,6 +158,7 @@ public class TowerDefenseView extends Application implements Observer {
 							Clip map2Clip = this.createAudioClip("src/sounds/get Schwifty.wav");
 							map2Clip.start();
 							backgroundMusic.start();
+							backgroundMusic.loop(20);
 							model.setNetworked(true);
 						}
 					});
@@ -176,6 +186,11 @@ public class TowerDefenseView extends Application implements Observer {
 		
 	}
 	
+	/**
+	 * This method creates and return an audio clip of the given file name
+	 * @param fileName A String of the file to create an audio clip
+	 * @return A Clip of the audio file to be played
+	 */
 	private Clip createAudioClip(String fileName) {
 		File audioFile = new File(fileName);
 		AudioInputStream aio;
@@ -195,7 +210,7 @@ public class TowerDefenseView extends Application implements Observer {
 	/**
 	 * Method that launches the playable game stage. It loads all proper
 	 * graphics for the road and towers, as well as all buttons necessary
-	 * for gameplay
+	 * for game play
 	 */
 	public void startGame() {
 		//Creates side bar
@@ -244,7 +259,6 @@ public class TowerDefenseView extends Application implements Observer {
 		sellButton.setFill(new ImagePattern(sellButtonImg));
 		sellButton.setOnMouseClicked((event) -> {
 			if(this.isSelling) {
-				sellButton.setFill(new ImagePattern(new Image("pictures/sellButtonPressed.png")));
 				this.isSelling = false;
 			} else {
 				this.isSelling = true;
@@ -345,7 +359,6 @@ public class TowerDefenseView extends Application implements Observer {
 		towerBox.getChildren().addAll(moneyLivesBox, rickTowerBox, mortyTowerBox,
 									meeseeksTowerBox, jerryTowerBox, 
 									birdpersonTowerBox, squanchyTowerBox, towerText);
-			
 		border.setBottom(towerBox);
 				
 				
@@ -451,8 +464,12 @@ public class TowerDefenseView extends Application implements Observer {
 		border.setTop(hbox);
 	}
 	
+	/**
+	 * This method sets up the network interface for a networked game
+	 */
 	public void setupNetwork() {
 		Socket socket = null;
+		// if a server, create a server and wait for a socket connection
 		if(!dialogBox.createType()) {
 			try {
 				ServerSocket server = new ServerSocket(this.dialogBox.getPort());
@@ -461,6 +478,7 @@ public class TowerDefenseView extends Application implements Observer {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		// if a client, connect to the server
 		} else {
 			try {
 				socket = new Socket(this.dialogBox.getAddress(), this.dialogBox.getPort());
@@ -476,10 +494,6 @@ public class TowerDefenseView extends Application implements Observer {
 			controller.listenForMap();
 		}
 		controller.startListening();
-		if(dialogBox.createType()) {
-			//controller.listenForPlay();
-			//controller.startListening();
-		}
 		
 	}
 	
@@ -506,6 +520,9 @@ public class TowerDefenseView extends Application implements Observer {
 	 * Private method that creates the dialog alert when the user has lost the
 	 * gamee, meaning the user's health has been depleted to 0. This alert gives
 	 * them an option to start a new game as well.
+	 * @param x An int of the x value
+	 * @param y An int of the y value
+	 * @return A rectangle of the current selected tower
 	 */
 	public Rectangle findNode(int x, int y) {
 		for (Node node: grid.getChildren()) {

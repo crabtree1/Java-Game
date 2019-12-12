@@ -75,9 +75,6 @@ public class TowerDefenseController {
 							public void run() {
 								if(other instanceof TDNetworkMessage) {
 									otherMessage = (TDNetworkMessage) other;
-								} else if (other instanceof ArrayList<?>) {
-									model.setEnemies((ArrayList<Enemy>)other);
-									return;
 								}
 								if(otherMessage.isPlaying()) {
 									startRound();
@@ -125,7 +122,9 @@ public class TowerDefenseController {
 		inputThread.start();
 	}
 	
-	
+	/**
+	 * This method listens for a map from the server and sets the map accordingly 
+	 */
 	public void listenForMap() {
 		try {
 			otherMessage = (TDNetworkMessage) ois.readObject();
@@ -141,31 +140,10 @@ public class TowerDefenseController {
 		}
 	}
 	
-	public void listenForPlay() {
-		Thread inputThread = new Thread(new Runnable() {
-			Object other = null;
-			@Override
-			public void run() {
-				try {
-					other = ois.readObject();
-				} catch (ClassNotFoundException | IOException e) {
-					e.printStackTrace();
-				}
-				if (other instanceof TDNetworkMessage) {
-					otherMessage = (TDNetworkMessage) other;
-					if(otherMessage.isPlaying()) {
-						startRound();
-					} else {
-						run();
-					}
-				} else {
-					run();
-				}
-			}
-		});
-		inputThread.start();
-	}
-	
+	/**
+	 * This method sends the map to the client
+	 * @param message A TDNetworkMessage containing the map
+	 */
 	public void sendMap(TDNetworkMessage message) {
 		try {
 			oos.writeObject(message);
@@ -174,6 +152,9 @@ public class TowerDefenseController {
 		}
 	}
 	
+	/** 
+	 * This method tells the client to start the round
+	 */
 	public void sendPlay() {
 		try {
 			oos.writeObject(new TDNetworkMessage(true));
@@ -182,6 +163,9 @@ public class TowerDefenseController {
 		}
 	}
 	
+	/**
+	 * This method sends the client the random seed needed to create random enemies
+	 */
 	public void sendSeeds() {
 		try {
 			oos.writeObject(new TDNetworkMessage(model.getSeed1(), model.getSeed2()));
@@ -207,6 +191,10 @@ public class TowerDefenseController {
 		return model;
 	}
 	
+	/**
+	 * This method sets an int representation of the current tower
+	 * @param curTower an int representing the current tower
+	 */
 	public void setTowerType(int curTower) {
 		this.curTowerType = curTower;
 	}
@@ -237,6 +225,10 @@ public class TowerDefenseController {
 		this.isTurn = isTurn;
 	}
 	
+	/**
+	 * This method sets a boolean indicating of the game is networked
+	 * @param isMultiplayer A boolean indicating if the current game is networked
+	 */
 	public void setMulitplayer(boolean isMultiplayer) {
 		this.isMultiplayer = isMultiplayer;
 	}
@@ -264,6 +256,10 @@ public class TowerDefenseController {
 		model.startRound();
 	}
 	
+	/** 
+	 * This method returns an Image of the current tower
+	 * @return An image of the current tower selected
+	 */
 	public Image getCurTower() {
 		return this.image;
 	}
@@ -420,6 +416,10 @@ public class TowerDefenseController {
 		return model.getGamePhase();
 	}
 	
+	/**
+	 * This method sets boolean if the game is a client
+	 * @param isClient  A boolean indicating if the game is a client
+	 */
 	public void setIsClient(boolean isClient) {
 		this.model.setClient(isClient);
 	}
@@ -470,6 +470,9 @@ public class TowerDefenseController {
 		return this.model.getRound();
 	}
 
+	/**
+	 * This method tells the other game in a networked game to pause
+	 */
 	public void sendPause() {
 		TDNetworkMessage temp = new TDNetworkMessage();
 		temp.setPaused(true);
