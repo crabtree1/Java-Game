@@ -273,14 +273,15 @@ public class TowerDefenseController {
 	 * @param currTowerClicked - the tower to be added to the tower map
 	 * @param mouseX - x coordinate of where the user clicked in the gui
 	 * @param mouseY - y coordinate of where the user clicked in the gui
+	 * @return A boolean indicating if the placement was successful
 	 */
-	public void addTower(Tower currTowerClicked, double mouseX, double mouseY) {
+	public boolean addTower(Tower currTowerClicked, double mouseX, double mouseY) {
 		if(!isTurn) {
-			return;
+			return false;
 		}
 		// only place a tower if the user can afford it
 		if((getMoney() - currTowerClicked.getCost()) < 0) {
-			return;
+			return false;
 		}
 		int row = 0;
 		int col = 0;
@@ -315,12 +316,12 @@ public class TowerDefenseController {
 		} 
 		if(!model.isClient() && isMultiplayer) {
 			if(col < 8) {
-				return;
+				return false;
 			}
 				
 		} else if (model.isClient() && isMultiplayer) {
 			if(col > 7) {
-				return;
+				return false;
 			}
 		}
 		this.model.spendMoney(currTowerClicked.getCost());
@@ -333,6 +334,7 @@ public class TowerDefenseController {
 			}
 			this.isTurn = false;
 		}
+	return true;
 	}
 	
 	/**

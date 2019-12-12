@@ -376,7 +376,9 @@ public class TowerDefenseView extends Application implements Observer {
 						temp.setFill(new ImagePattern(pic));
 					} else {
 						if (currTowerClicked != null) {
-							controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY());
+							if(!controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY())) {
+								return;
+							}
 							if(currTowerClicked instanceof MeeseeksTower) {
 								Clip meeseeks = this.createAudioClip("src/sounds/Meeseeks.wav");
 								meeseeks.start();
@@ -446,8 +448,10 @@ public class TowerDefenseView extends Application implements Observer {
 					Image fastForward = new Image("pictures/fastForwardButton.png");
 					temp.setFill(new ImagePattern(fastForward));
 					temp.setOnMouseClicked(e -> {
-						if (controller.getGamePhase().equals("attack")) {
-							controller.increaseGameSpeed();
+						if(!isMultiplayer) {
+							if (controller.getGamePhase().equals("attack")) {
+								controller.increaseGameSpeed();
+							}
 						}
 					});
 				}

@@ -1,3 +1,4 @@
+
 /**
  * This class contains the main for our tower defense game. The game is created in
  * the MVC design style. The game also depends on many subclasses such as types of enemies,
@@ -7,7 +8,6 @@
  * will continue playing until their health is depleted. Additionally, players will be able to play
  * with another player with each one controlling one half of the board.
  */
-
 import javafx.application.Application;
 
 public class TowerDefense {
