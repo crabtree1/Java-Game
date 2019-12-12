@@ -6,9 +6,11 @@
  * attack enemies, enemeis are generated and moved, and towers can be placed.
  * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
  */
-
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.Random;
 
 public class TowerDefenseModel extends Observable{
 
@@ -24,6 +26,12 @@ public class TowerDefenseModel extends Observable{
 	private int[][] pathToFollow;
 	private int round = 1;
 	private int probability = 1;
+	private long seed1;
+	private long seed2;
+	private boolean isClient = false;
+	private boolean isNetworked = false;
+	
+	private ObjectOutputStream oos;
 	
 	/**
 	 * Constructor for the tower defense model
@@ -92,6 +100,20 @@ public class TowerDefenseModel extends Observable{
 			public void run() {
 				int i = 0;
 				while(i < roundEnemies || enemyMap.size() != 0) {
+					if(!isClient) {
+						Random randSeed = new Random();
+						seed1 = randSeed.nextLong();
+						seed2 = randSeed.nextLong();
+						if(isNetworked) {
+							try {
+								oos.writeObject(new TDNetworkMessage(getSeed1(), getSeed2()));
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+					Random rand = new Random(seed1);
+					Random rand1 = new Random(seed2);
 					if(getHealth() < 0) {
 						enemyMap = new ArrayList<Enemy>();
 						break;
@@ -99,9 +121,9 @@ public class TowerDefenseModel extends Observable{
 					int speedToSleep = 40;
 					if (!paused) {
 						moveEnemies();
-						int createProb = (int) (Math.random() * 4);
+						int createProb = (int) (rand.nextDouble() * 4);
 						if (createProb < probability && i < roundEnemies) {
-							int randomEnemy = ((int) (Math.random() * 5)) + 1;
+							int randomEnemy = ((int) (rand1.nextDouble() * 5)) + 1;
 							createEnemy(randomEnemy);
 							i += 1;
 						}
@@ -136,6 +158,7 @@ public class TowerDefenseModel extends Observable{
 			return;
 		}
 		Enemy enemy = null;
+		//int randomEnemy = 1;
 		if (randomEnemy == 1) {
 			enemy = new PickelRickEnemy();
 		} else if  (randomEnemy == 2){
@@ -144,11 +167,9 @@ public class TowerDefenseModel extends Observable{
 			enemy  = new DoofusRickEnemy();
 		} else if (randomEnemy == 4) {
 			enemy = new EvilRickEnemy();
-		} else {
+		} else if(randomEnemy == 5){
 			enemy = new GuardRickEnemy();
 		}
-		
-		
 		enemy.setCords(road.getStartingPos()[0], road.getStartingPos()[1]);
 		enemyMap.add(enemy);
 	}
@@ -265,6 +286,16 @@ public class TowerDefenseModel extends Observable{
 		notifyObservers(returnArray);
 	}
 	
+	public void removeTowerNetwork(int x, int y) {
+		System.out.print("Removing Via Network");
+		towerMap[x][y] = null;
+		//this.money += currTowerClicked.getCost()/2;
+		
+		int[] returnArray = {x, y};
+		setChanged();
+		notifyObservers(returnArray);
+	}
+	
 	/**
 	 * Getter to get the user's money
 	 * @return the money
@@ -310,14 +341,14 @@ public class TowerDefenseModel extends Observable{
 	 * if any enemies are touching the towers, and if they are, they are attacked.
 	 */
 	public void towerAttack() {
-    boolean hasEnemy;
+		boolean hasEnemy;
 		//Tower[][] towers = controller.getTowerMap();
 		for (int i = 0; i < towerMap.length; i ++) {
 			for (int j = 0; j < towerMap[i].length; j ++) {
 				int enemiesHit = 0;
 				for (int k = 0; k < enemyMap.size(); k ++) {
 					Enemy currEnemy = enemyMap.get(k);
-					if (towerMap[i][j] != null) {						
+					if (towerMap[i][j] != null) {
 						int temp = currEnemy.getHealth();
 						hasEnemy = false;
 						if (towerMap[i][j] instanceof BirdPersonTower) {
@@ -447,4 +478,39 @@ public class TowerDefenseModel extends Observable{
 		this.health = amount;
 	}
 	
+	public void setEnemies(ArrayList<Enemy> enemyMap) {
+		this.enemyMap = enemyMap;
+	}
+	
+	public void setClient(boolean isClient) {
+		this.isClient = isClient;
+	}
+	
+	public boolean isClient() {
+		return isClient;
+	}
+	
+	public void setSeed1(Long seed1) {
+		this.seed1 = seed1;
+	}
+	
+	public void setSeed2(Long seed2) {
+		this.seed2 = seed2;
+	}
+	
+	public Long getSeed1() {
+		return this.seed1;
+	}
+	
+	public Long getSeed2() {
+		return this.seed2;
+	}
+	
+	public void setOOS(ObjectOutputStream oos) {
+		this.oos = oos;
+	}
+	
+	public void setNetworked(boolean isNetworked) {
+		this.isNetworked = isNetworked;
+	}
 }

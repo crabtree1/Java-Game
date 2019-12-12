@@ -10,6 +10,9 @@
  * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
  */
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
@@ -49,6 +52,586 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 public class TowerDefenseView extends Application implements Observer {
+	
+
+	private TowerDefenseModel model;
+	private TowerDefenseController controller;
+	private BorderPane border;
+	private Tower currTowerClicked = null;
+	private GridPane grid;
+	private VBox sideBar;
+	private HBox towerBox;
+	private Rectangle towerText;
+	private Text money;
+	private Text lives;
+	private boolean isSelling = false;
+	private Stage stage;
+	private Text roundLabel;
+	private boolean isMultiplayer = false;
+	TwoPlayerDialogBox dialogBox;
+	
+	/**
+	 * Method to launch the gui and set all proper menus and pictures
+	 */
+	@Override
+	public void start(Stage stage) throws Exception {
+		this.stage = stage;
+		model = new TowerDefenseModel();
+		controller = new TowerDefenseController(model);
+		model.addObserver(this);
+		
+		stage.setTitle("Rick and Morty Tower Defense");
+		
+		border = new BorderPane();
+		Rectangle mainMenu = new Rectangle();
+		mainMenu.setWidth(1000);
+		mainMenu.setHeight(727);
+		mainMenu.setOnMouseClicked((event) -> {
+			if (event.getX() > 45 && event.getX() < 380 && event.getY() > 350 && event.getY() < 411) {
+				isMultiplayer = false;
+				Image mapSelection = new Image("pictures/mapSelection.png");
+				mainMenu.setFill(new ImagePattern(mapSelection));
+				mainMenu.setOnMouseClicked((event2) -> {
+					if (event2.getX() > 75 && event2.getX() < 453 && event2.getY() > 100 && event2.getY() < 611) {
+						controller.setRoad(new Road1());
+						startGame();
+					}
+					else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
+						controller.setRoad(new Road2());
+						startGame();
+					}
+				});
+			}
+		
+			else if (event.getX() > 40 && event.getX() < 336 && event.getY() > 455 && event.getY() < 520 ) {
+				dialogBox = new TwoPlayerDialogBox();
+				if(!dialogBox.createType()) {
+					Image mapSelection = new Image("pictures/mapSelection.png");
+					mainMenu.setFill(new ImagePattern(mapSelection));
+					mainMenu.setOnMouseClicked((event2) -> {
+						if (event2.getX() > 75 && event2.getX() < 453 && event2.getY() > 100 && event2.getY() < 611) {
+							controller.setRoad(new Road1());
+							controller.sendMap(new TDNetworkMessage(1));
+							startGame();
+							model.setNetworked(true);
+						}
+						else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
+							controller.setRoad(new Road2());
+							controller.sendMap(new TDNetworkMessage(2));
+							startGame();
+							model.setNetworked(true);
+						}
+					});
+				}
+				setupNetwork();
+				isMultiplayer = true;
+				controller.setMulitplayer(isMultiplayer);
+				//controller.setRoad(new Road1());
+				if(dialogBox.createType()) {
+					startGame();
+				}
+			}
+		});
+		Image titleScreen = new Image("pictures/titleScreen.png");
+		mainMenu.setFill(new ImagePattern(titleScreen));
+		border.setCenter(mainMenu);
+
+		// right bar (width): 295px
+		// map (width): 705px
+		Scene scene = new Scene(border, 1000, 727);
+		stage.setScene(scene);
+		stage.show();
+	}
+	
+	/**
+	 * Method that launches the playable game stage. It loads all proper
+	 * graphics for the road and towers, as well as all buttons necessary
+	 * for gameplay
+	 */
+	public void startGame() {
+		//Creates side bar
+		sideBar = new VBox();
+		sideBar.setMinHeight(600);
+		sideBar.setMinWidth(295);
+		Rectangle defaultPanel = new Rectangle();
+		defaultPanel.setWidth(295);
+		defaultPanel.setHeight(600);
+		Image defaultPanelPic = new Image("pictures/defaultPanel.png");
+		defaultPanel.setFill(new ImagePattern(defaultPanelPic));
+		sideBar.getChildren().add(defaultPanel);
+		sideBar.setStyle("-fx-border-color: black;\n"
+		              + "-fx-border-width: 6;\n");
+		border.setRight(sideBar);
+				
+		towerText = new Rectangle();
+		towerText.setWidth(295);
+		towerText.setHeight(100);
+		towerText.setFill(Color.BLACK);
+			
+			
+		//Creates tower panels
+		towerBox = new HBox();
+		towerBox.setMaxWidth(705);
+			
+		VBox moneyLivesBox = new VBox();
+		moneyLivesBox.setStyle("-fx-background-image: url(\"pictures/moneyLivesBackground.png\")");
+		moneyLivesBox.setPadding(new Insets(5, 0, 0, 25));
+		moneyLivesBox.setMinHeight(100);
+		moneyLivesBox.setMinWidth(105);
+		moneyLivesBox.setAlignment(Pos.TOP_CENTER);
+		money = new Text(Integer.toString(this.controller.getMoney()));
+		money.setFont(Font.font ("Verdana", 23));
+		money.setFill(Color.YELLOW);
+		lives = new Text(Integer.toString(this.controller.getHealth()));
+		lives.setFont(Font.font ("Verdana", 23));
+		lives.setFill(Color.YELLOW);
+		moneyLivesBox.getChildren().addAll(lives, money);
+				
+		//sell button
+		Rectangle sellButton = new Rectangle();
+		sellButton.setWidth(60);
+		sellButton.setHeight(35);
+		Image sellButtonImg = new Image("pictures/sellButton.png");
+		sellButton.setFill(new ImagePattern(sellButtonImg));
+		sellButton.setOnMouseClicked((event) -> {
+			if(this.isSelling) {
+				sellButton.setFill(new ImagePattern(new Image("pictures/sellButtonPressed.png")));
+				this.isSelling = false;
+			} else {
+				this.isSelling = true;
+			}
+		});
+		moneyLivesBox.getChildren().add(sellButton);
+				
+		VBox rickTowerBox = new VBox();
+		rickTowerBox.setMinWidth(100);
+		rickTowerBox.setMinHeight(100);
+		Rectangle rickPanel = new Rectangle();
+		rickPanel.setWidth(100);
+		rickPanel.setHeight(100);
+		Image rickPanelImg = new Image("/pictures/rickPanel.png");
+		rickPanel.setFill(new ImagePattern(rickPanelImg));
+		rickTowerBox.getChildren().add(rickPanel);
+		rickTowerBox.setOnMouseClicked((event) -> {
+			controller.setTowerType(4);
+			currTowerClicked = new RickTower();
+			setPortrait();
+		});
+			
+		VBox mortyTowerBox = new VBox();
+		mortyTowerBox.setMinWidth(100);
+		mortyTowerBox.setMinHeight(100);
+		Rectangle mortyPanel = new Rectangle();
+		mortyPanel.setWidth(100);
+		mortyPanel.setHeight(100);
+		Image mortyPanelImg = new Image("/pictures/mortyPanel.png");
+		mortyPanel.setFill(new ImagePattern(mortyPanelImg));
+		mortyTowerBox.getChildren().add(mortyPanel);
+		mortyTowerBox.setOnMouseClicked((event) -> {
+			controller.setTowerType(3);
+			currTowerClicked = new MortyTower();
+			setPortrait();
+		});
+				
+		VBox meeseeksTowerBox = new VBox();
+		meeseeksTowerBox.setMinWidth(100);
+		meeseeksTowerBox.setMinHeight(100);
+		Rectangle meeseeksPanel = new Rectangle();
+		meeseeksPanel.setWidth(100);
+		meeseeksPanel.setHeight(100);
+		Image meeseeksPanelImg = new Image("/pictures/meeseeksPanel.png");
+		meeseeksPanel.setFill(new ImagePattern(meeseeksPanelImg));
+		meeseeksTowerBox.getChildren().add(meeseeksPanel);
+		meeseeksTowerBox.setOnMouseClicked((event) -> {
+			controller.setTowerType(2);
+			currTowerClicked = new MeeseeksTower();
+			setPortrait();
+		});
+			
+		VBox jerryTowerBox = new VBox();
+		jerryTowerBox.setMinWidth(100);
+		jerryTowerBox.setMinHeight(100);
+		Rectangle jerryPanel = new Rectangle();
+		jerryPanel.setWidth(100);
+		jerryPanel.setHeight(100);
+		Image jerryPanelImg = new Image("/pictures/jerryPanel.png");
+		jerryPanel.setFill(new ImagePattern(jerryPanelImg));
+		jerryTowerBox.getChildren().add(jerryPanel);
+		jerryTowerBox.setOnMouseClicked((event) -> {
+			controller.setTowerType(1);
+			currTowerClicked = new JerryTower();
+			setPortrait();
+		});
+			
+		VBox birdpersonTowerBox = new VBox();
+		birdpersonTowerBox.setMinWidth(100);
+		birdpersonTowerBox.setMinHeight(100);
+		Rectangle birdpersonPanel = new Rectangle();
+		birdpersonPanel.setWidth(100);
+		birdpersonPanel.setHeight(100);
+		Image birdpersonPanelImg = new Image("/pictures/birdpersonPanel.png");
+		birdpersonPanel.setFill(new ImagePattern(birdpersonPanelImg));
+		birdpersonTowerBox.getChildren().add(birdpersonPanel);
+		birdpersonTowerBox.setOnMouseClicked((event) -> {
+			controller.setTowerType(0);
+			currTowerClicked = new BirdPersonTower();
+			setPortrait();
+		});
+			
+		VBox squanchyTowerBox = new VBox();
+		squanchyTowerBox.setMinWidth(100);
+		squanchyTowerBox.setMinHeight(100);
+		Rectangle squanchyPanel = new Rectangle();
+		squanchyPanel.setWidth(100);
+		squanchyPanel.setHeight(100);
+		Image squanchyPanelImg = new Image("/pictures/squanchyPanel.png");
+		squanchyPanel.setFill(new ImagePattern(squanchyPanelImg));
+		squanchyTowerBox.getChildren().add(squanchyPanel);
+		squanchyTowerBox.setOnMouseClicked((event) -> {
+			controller.setTowerType(5);
+			currTowerClicked = new SquanchyTower();
+			setPortrait();
+		});
+			
+		towerBox.getChildren().addAll(moneyLivesBox, rickTowerBox, mortyTowerBox,
+									meeseeksTowerBox, jerryTowerBox, 
+									birdpersonTowerBox, squanchyTowerBox, towerText);
+			
+		border.setBottom(towerBox);
+				
+				
+		//Creates map
+		grid = new GridPane();
+		int[][] currMap = controller.getRoad().getMap();
+		for (int i = 0; i < currMap.length; i++) {
+			for (int j = 0; j < currMap[i].length; j++) {
+				Rectangle temp = new Rectangle();
+				temp.setOnMouseClicked((event) -> {
+					if(this.isSelling) {
+						this.controller.sellTower(event.getSceneX(), event.getSceneY());
+						this.isSelling = false;
+						Image pic = new Image("/pictures/space.png");
+						temp.setFill(new ImagePattern(pic));
+					} else {
+						if (currTowerClicked != null) {
+							controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY());
+						}
+						
+					}
+				});
+				temp.setWidth(47);
+				temp.setHeight(47);
+				if (currMap[i][j] == 0) {
+					Image pic = new Image("/pictures/space.png");
+					temp.setFill(new ImagePattern(pic));
+				}
+				else if (currMap[i][j] == 1){
+					Image pic = new Image("/pictures/road.png");
+					temp.setFill(new ImagePattern(pic));
+				}
+				else if (currMap[i][j] == 2){
+					Image pic = new Image("/pictures/portal.png");
+					temp.setFill(new ImagePattern(pic));
+				} else if (currMap[i][j] == 3) {
+					Image pause = new Image("pictures/pauseButton.png");
+					temp.setFill(new ImagePattern(pause));
+					temp.setOnMouseClicked(e -> {
+						if (controller.getGamePhase().equals("attack")) {
+							if(isMultiplayer) {
+								controller.sendPause();
+								controller.changePaused();
+							} else {
+								controller.changePaused();
+							}
+						}
+					});
+				} else if (currMap[i][j] == 4){
+					Image play = new Image("pictures/playButton.png");
+					temp.setFill(new ImagePattern(play));
+					temp.setOnMouseClicked(e -> {
+						if (controller.getGamePhase().equals("place")) {
+							if(isMultiplayer) {
+								if(!dialogBox.createType()) {
+									controller.startRound();
+									//controller.sendEnimies();
+									controller.sendPlay();
+								}
+							} else {
+								controller.startRound();
+							}
+						}
+					});
+				} else {
+					Image fastForward = new Image("pictures/fastForwardButton.png");
+					temp.setFill(new ImagePattern(fastForward));
+					temp.setOnMouseClicked(e -> {
+						if (controller.getGamePhase().equals("attack")) {
+							controller.increaseGameSpeed();
+						}
+					});
+				}
+				grid.add(temp, j, i);
+			}
+		}
+		border.setCenter(grid);
+		
+
+		roundLabel = new Text("Round 1");
+		HBox hbox = new HBox();
+		hbox.setAlignment(Pos.CENTER);
+		hbox.getChildren().add(roundLabel);
+		border.setTop(hbox);
+	}
+	
+	public void setupNetwork() {
+		Socket socket = null;
+		if(!dialogBox.createType()) {
+			try {
+				ServerSocket server = new ServerSocket(this.dialogBox.getPort());
+				socket = server.accept();
+				server.close();
+				System.out.println("Server");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				socket = new Socket(this.dialogBox.getAddress(), this.dialogBox.getPort());
+				controller.setTurn(false);
+				controller.setIsClient(true);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		this.controller.initStreams(socket);
+		if(dialogBox.createType()) {
+			controller.listenForMap();
+		}
+		controller.startListening();
+		if(dialogBox.createType()) {
+			//controller.listenForPlay();
+			//controller.startListening();
+		}
+		
+	}
+	
+	/**
+	 * Method to set the portrait of the gui depending on what
+	 * tower the user has clicked on most recently
+	 */
+	public void setPortrait() {
+		Rectangle portrait = new Rectangle();
+		portrait.setWidth(295);
+		portrait.setHeight(600);
+		Image currPortrait = new Image(currTowerClicked.getTowerPortrait());
+		portrait.setFill(new ImagePattern(currPortrait));
+		sideBar.getChildren().clear();
+		sideBar.getChildren().add(portrait);
+		
+		towerBox.getChildren().remove(towerText);
+		Image currName = new Image(currTowerClicked.getTowerName());
+		towerText.setFill(new ImagePattern(currName));
+		towerBox.getChildren().add(towerText);
+	}
+
+	/**
+	 * Private method that creates the dialog alert when the user has lost the
+	 * gamee, meaning the user's health has been depleted to 0. This alert gives
+	 * them an option to start a new game as well.
+	 */
+	public Rectangle findNode(int x, int y) {
+		for (Node node: grid.getChildren()) {
+			if(grid.getRowIndex(node) == x && grid.getColumnIndex(node) == y) {
+				Rectangle curr = (Rectangle) node;
+				return curr;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Private method that creates the dialog alert when the user has lost the
+	 * gamee, meaning the user's health has been depleted to 0. This alert gives
+	 * them an option to start a new game as well.
+	 */
+	private void showLost() {
+		Alert lossAlert = new Alert(AlertType.INFORMATION);
+		lossAlert.setHeaderText("Message");
+		lossAlert.setContentText("You lost! New Game?");
+		ButtonType newGame = new ButtonType("NewGame");
+		lossAlert.getButtonTypes().add(newGame);
+		Optional<ButtonType> option = lossAlert.showAndWait();
+		
+		if(option.get() == newGame) {
+			try {
+				start(stage);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	/**
+	 * Private method that creates the dialog alert when the user has won the
+	 * game. This alert gives them the option to start a new game.
+	 */
+	private void showWin() {
+		Alert winAlert = new Alert(AlertType.INFORMATION);
+		winAlert.setHeaderText("Winner!");
+		winAlert.setContentText("You Win! New Game?");
+		ButtonType newGame = new ButtonType("NewGame");
+		winAlert.getButtonTypes().add(newGame);
+		Optional<ButtonType> option = winAlert.showAndWait();
+		
+		if(option.get() == newGame) {
+			try {
+				start(stage);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+
+	/**
+	 * Method that helps the gui run the actual game logic from the controller.
+	 * It has varying behaviors depending on the phase of the game (attack or place)
+	 * and provides the most up to date graphic representation of the game being
+	 * played in the model.
+	 */
+	@Override
+	public void update(Observable o, Object arg) {
+		// in the place phase, determine if the user has won the game, and if not
+		// allow them to place towers and update the gui accordingly
+		if (controller.getGamePhase().equals("place")) {
+			if (arg == null) {
+				if (controller.getRound() == 3) {
+					Platform.runLater(new Runnable() {
+						@Override
+						public void run() {
+							showWin();
+						}
+					});
+					return;
+				}
+				String string = "Round " + Integer.toString(controller.getRound());
+				roundLabel.setText(string);
+			}else {
+				money.setText(Integer.toString(this.controller.getMoney()));
+				Image pic;
+				int[] coords = (int[]) arg;
+				Rectangle curr = findNode(coords[0], coords[1]);
+				if(!controller.getTurn()) {
+					pic = controller.getCurTower();
+				} else {
+					pic = new Image(currTowerClicked.getTowerPic());
+				}
+		        curr.setFill(new ImagePattern(pic));
+			}
+		} else {
+			// in the attack phase, run the game as normal until the round
+			// is over or the user has died.
+			if(this.controller.getHealth() <= 0) {
+				lives.setText("0");
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						showLost();
+					}
+				});
+			} else {
+				lives.setText(Integer.toString(this.controller.getHealth()));
+			}
+			// have towers attack enemies, continue moving enemies along the path
+			// as long as they are alive
+			ArrayList<Enemy> enemies = (ArrayList<Enemy>) arg;
+			int[][] currMap = controller.getRoad().getMap();
+			this.controller.towerAttack();
+						
+			//FOR EACH TOWER
+			Tower[][] towerMap = controller.getTowerMap();
+			for (int i = 0; i < towerMap.length; i++) {
+				for (int j = 0; j < towerMap[i].length; j ++) {
+					// IF TOWER IS NOT EQUAL TO NULL
+					if (towerMap[i][j] != null) {
+						ArrayList<Enemy> enemiesList = towerMap[i][j].getEnemiesToAttack();
+						//SEARCH THROUGH ENEMIES NEXT TO CURRENT TOWER
+						for (int k = 0; k < enemiesList.size(); k++) {
+							Rectangle test = new Rectangle();
+							test.setWidth(10);
+							test.setHeight(10);
+							if (towerMap[i][j] instanceof RickTower) {
+								test.setFill(Color.GREENYELLOW);
+							}
+							else if (towerMap[i][j] instanceof JerryTower) {
+								test.setFill(Color.LIGHTSKYBLUE);
+							}
+							else if (towerMap[i][j] instanceof MortyTower) {
+								test.setFill(Color.RED);
+							}
+							else if (towerMap[i][j] instanceof MeeseeksTower) {
+								test.setFill(Color.SLATEBLUE);
+							}
+							else if (towerMap[i][j] instanceof SquanchyTower) {
+								test.setFill(Color.ORANGE);
+							}	
+							else if (towerMap[i][j] instanceof BirdPersonTower) {
+								test.setFill(Color.WHITE);
+							}	
+							Path path = new Path();
+							
+							//starting point
+							path.getElements().add(new MoveTo((towerMap[i][j].getX() * 47) + 23, (((towerMap[i][j].getY()) * 47) + 40)));
+							
+							//ending point
+							path.getElements().add(new LineTo((enemiesList.get(k).getY() * 47) + 23, ((enemiesList.get(k).getX() * 47)) + 40));
+							
+							PathTransition pathTransition = new PathTransition();
+							pathTransition.setDuration(Duration.millis(controller.getGameSpeed()));
+							pathTransition.setNode(test);
+							pathTransition.setPath(path);
+							pathTransition.setOnFinished((eventTest) -> {
+								border.getChildren().remove(test);
+							});
+							pathTransition.play();
+
+							Platform.runLater(new Runnable() {
+				                 @Override public void run() {
+				                     border.getChildren().add(test);
+				                 }
+				             });
+						}
+						towerMap[i][j].clearEnemies();
+					}
+				}
+			}
+					
+			for (int i = 0; i < currMap.length; i++) {
+				for (int j = 0; j < currMap[i].length; j++) {
+					boolean found  = false;
+					if (currMap[i][j] == 1) {
+						Rectangle curr = findNode(i, j);
+						for (int k = 0; k < enemies.size(); k++) {
+							Enemy currEnemy = enemies.get(k);
+							if (i == currEnemy.getX() && j == currEnemy.getY()) {
+								Image enemyPic = new Image(currEnemy.getTowerPic());
+								curr.setFill(new ImagePattern(enemyPic));
+								found = true;
+								break;
+							}
+						}
+						if (!found) {
+							Image pic = new Image("/pictures/road.png");
+							curr.setFill(new ImagePattern(pic));
+						}
+					}
+
+				}
+			}
+			money.setText(Integer.toString(this.controller.getMoney()));
+		}
+	}
 	
 	/**
 	 * Private inner class that creates the two player dialog
@@ -184,502 +767,6 @@ public class TowerDefenseView extends Application implements Observer {
 				return false;
 			}
 			return true;
-		}
-	}
-
-	private TowerDefenseModel model;
-	private TowerDefenseController controller;
-	private BorderPane border;
-	private Tower currTowerClicked = null;
-	private GridPane grid;
-	private VBox sideBar;
-	private HBox towerBox;
-	private Rectangle towerText;
-	private Text money;
-	private Text lives;
-	private boolean isSelling = false;
-	private Stage stage;
-	private Text roundLabel;
-	
-	/**
-	 * Method to launch the gui and set all proper menus and pictures
-	 */
-	@Override
-	public void start(Stage stage) throws Exception {
-		this.stage = stage;
-		model = new TowerDefenseModel();
-		controller = new TowerDefenseController(model);
-		model.addObserver(this);
-		
-		stage.setTitle("Rick and Morty Tower Defense");
-		
-		border = new BorderPane();
-		Rectangle mainMenu = new Rectangle();
-		mainMenu.setWidth(1000);
-		mainMenu.setHeight(727);
-		mainMenu.setOnMouseClicked((event) -> {
-			if (event.getX() > 45 && event.getX() < 380 && event.getY() > 350 && event.getY() < 411) {
-				Image mapSelection = new Image("pictures/mapSelection.png");
-				mainMenu.setFill(new ImagePattern(mapSelection));
-				mainMenu.setOnMouseClicked((event2) -> {
-					if (event2.getX() > 75 && event2.getX() < 453 && event2.getY() > 100 && event2.getY() < 611) {
-						controller.setRoad(new Road1());
-					}
-					else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
-						controller.setRoad(new Road2());
-					}
-					startGame();
-				});
-			}
-			else if (event.getX() > 40 && event.getX() < 336 && event.getY() > 455 && event.getY() < 520 ) {
-				TwoPlayerDialogBox dialogBox = new TwoPlayerDialogBox();
-			}
-		});
-		Image titleScreen = new Image("pictures/titleScreen.png");
-		mainMenu.setFill(new ImagePattern(titleScreen));
-		border.setCenter(mainMenu);
-
-		// right bar (width): 295px
-		// map (width): 705px
-		Scene scene = new Scene(border, 1000, 727);
-		stage.setScene(scene);
-		stage.show();
-	}
-	
-	/**
-	 * Method that launches the playable game stage. It loads all proper
-	 * graphics for the road and towers, as well as all buttons necessary
-	 * for gameplay
-	 */
-	public void startGame() {
-		//Creates side bar
-		sideBar = new VBox();
-		sideBar.setMinHeight(600);
-		sideBar.setMinWidth(295);
-		Rectangle defaultPanel = new Rectangle();
-		defaultPanel.setWidth(295);
-		defaultPanel.setHeight(600);
-		Image defaultPanelPic = new Image("pictures/defaultPanel.png");
-		defaultPanel.setFill(new ImagePattern(defaultPanelPic));
-		sideBar.getChildren().add(defaultPanel);
-		sideBar.setStyle("-fx-border-color: black;\n"
-		              + "-fx-border-width: 6;\n");
-		border.setRight(sideBar);
-				
-		towerText = new Rectangle();
-		towerText.setWidth(295);
-		towerText.setHeight(100);
-		towerText.setFill(Color.BLACK);
-			
-			
-		//Creates tower panels
-		towerBox = new HBox();
-		towerBox.setMaxWidth(705);
-			
-		VBox moneyLivesBox = new VBox();
-		moneyLivesBox.setStyle("-fx-background-image: url(\"pictures/moneyLivesBackground.png\")");
-		moneyLivesBox.setPadding(new Insets(5, 0, 0, 25));
-		moneyLivesBox.setMinHeight(100);
-		moneyLivesBox.setMinWidth(105);
-		moneyLivesBox.setAlignment(Pos.TOP_CENTER);
-		money = new Text(Integer.toString(this.controller.getMoney()));
-		money.setFont(Font.font ("Verdana", 23));
-		money.setFill(Color.YELLOW);
-		lives = new Text(Integer.toString(this.controller.getHealth()));
-		lives.setFont(Font.font ("Verdana", 23));
-		lives.setFill(Color.YELLOW);
-		moneyLivesBox.getChildren().addAll(lives, money);
-				
-		//sell button
-		Rectangle sellButton = new Rectangle();
-		sellButton.setWidth(60);
-		sellButton.setHeight(35);
-		Image sellButtonImg = new Image("pictures/sellButton.png");
-		sellButton.setFill(new ImagePattern(sellButtonImg));
-		sellButton.setOnMouseClicked((event) -> {
-			if(this.isSelling) {
-				sellButton.setFill(new ImagePattern(new Image("pictures/sellButtonPressed.png")));
-				this.isSelling = false;
-			} else {
-				this.isSelling = true;
-			}
-		});
-		moneyLivesBox.getChildren().add(sellButton);
-				
-		VBox rickTowerBox = new VBox();
-		rickTowerBox.setMinWidth(100);
-		rickTowerBox.setMinHeight(100);
-		Rectangle rickPanel = new Rectangle();
-		rickPanel.setWidth(100);
-		rickPanel.setHeight(100);
-		Image rickPanelImg = new Image("/pictures/rickPanel.png");
-		rickPanel.setFill(new ImagePattern(rickPanelImg));
-		rickTowerBox.getChildren().add(rickPanel);
-		rickTowerBox.setOnMouseClicked((event) -> {
-			currTowerClicked = new RickTower();
-			setPortrait();
-		});
-			
-		VBox mortyTowerBox = new VBox();
-		mortyTowerBox.setMinWidth(100);
-		mortyTowerBox.setMinHeight(100);
-		Rectangle mortyPanel = new Rectangle();
-		mortyPanel.setWidth(100);
-		mortyPanel.setHeight(100);
-		Image mortyPanelImg = new Image("/pictures/mortyPanel.png");
-		mortyPanel.setFill(new ImagePattern(mortyPanelImg));
-		mortyTowerBox.getChildren().add(mortyPanel);
-		mortyTowerBox.setOnMouseClicked((event) -> {
-			currTowerClicked = new MortyTower();
-			setPortrait();
-		});
-				
-		VBox meeseeksTowerBox = new VBox();
-		meeseeksTowerBox.setMinWidth(100);
-		meeseeksTowerBox.setMinHeight(100);
-		Rectangle meeseeksPanel = new Rectangle();
-		meeseeksPanel.setWidth(100);
-		meeseeksPanel.setHeight(100);
-		Image meeseeksPanelImg = new Image("/pictures/meeseeksPanel.png");
-		meeseeksPanel.setFill(new ImagePattern(meeseeksPanelImg));
-		meeseeksTowerBox.getChildren().add(meeseeksPanel);
-		meeseeksTowerBox.setOnMouseClicked((event) -> {
-			currTowerClicked = new MeeseeksTower();
-			setPortrait();
-		});
-			
-		VBox jerryTowerBox = new VBox();
-		jerryTowerBox.setMinWidth(100);
-		jerryTowerBox.setMinHeight(100);
-		Rectangle jerryPanel = new Rectangle();
-		jerryPanel.setWidth(100);
-		jerryPanel.setHeight(100);
-		Image jerryPanelImg = new Image("/pictures/jerryPanel.png");
-		jerryPanel.setFill(new ImagePattern(jerryPanelImg));
-		jerryTowerBox.getChildren().add(jerryPanel);
-		jerryTowerBox.setOnMouseClicked((event) -> {
-			currTowerClicked = new JerryTower();
-			setPortrait();
-		});
-			
-		VBox birdpersonTowerBox = new VBox();
-		birdpersonTowerBox.setMinWidth(100);
-		birdpersonTowerBox.setMinHeight(100);
-		Rectangle birdpersonPanel = new Rectangle();
-		birdpersonPanel.setWidth(100);
-		birdpersonPanel.setHeight(100);
-		Image birdpersonPanelImg = new Image("/pictures/birdpersonPanel.png");
-		birdpersonPanel.setFill(new ImagePattern(birdpersonPanelImg));
-		birdpersonTowerBox.getChildren().add(birdpersonPanel);
-		birdpersonTowerBox.setOnMouseClicked((event) -> {
-		currTowerClicked = new BirdPersonTower();
-		setPortrait();
-		});
-			
-		VBox squanchyTowerBox = new VBox();
-		squanchyTowerBox.setMinWidth(100);
-		squanchyTowerBox.setMinHeight(100);
-		Rectangle squanchyPanel = new Rectangle();
-		squanchyPanel.setWidth(100);
-		squanchyPanel.setHeight(100);
-		Image squanchyPanelImg = new Image("/pictures/squanchyPanel.png");
-		squanchyPanel.setFill(new ImagePattern(squanchyPanelImg));
-		squanchyTowerBox.getChildren().add(squanchyPanel);
-		squanchyTowerBox.setOnMouseClicked((event) -> {
-			currTowerClicked = new SquanchyTower();
-			setPortrait();
-		});
-			
-		towerBox.getChildren().addAll(moneyLivesBox, rickTowerBox, mortyTowerBox,
-									meeseeksTowerBox, jerryTowerBox, 
-									birdpersonTowerBox, squanchyTowerBox, towerText);
-			
-		border.setBottom(towerBox);
-				
-				
-		//Creates map
-		grid = new GridPane();
-		int[][] currMap = controller.getRoad().getMap();
-		for (int i = 0; i < currMap.length; i++) {
-			for (int j = 0; j < currMap[i].length; j++) {
-				Rectangle temp = new Rectangle();
-				temp.setOnMouseClicked((event) -> {
-					if(this.isSelling) {
-						this.controller.sellTower(event.getSceneX(), event.getSceneY());
-						this.isSelling = false;
-						Image pic = new Image("/pictures/space.png");
-						temp.setFill(new ImagePattern(pic));
-					} else {
-						if (currTowerClicked != null) {
-							controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY());
-						}
-						
-					}
-				});
-				temp.setWidth(47);
-				temp.setHeight(47);
-				if (currMap[i][j] == 0) {
-					Image pic = new Image("/pictures/space.png");
-					temp.setFill(new ImagePattern(pic));
-				}
-				else if (currMap[i][j] == 1){
-					Image pic = new Image("/pictures/road.png");
-					temp.setFill(new ImagePattern(pic));
-				}
-				else if (currMap[i][j] == 2){
-					Image pic = new Image("/pictures/portal.png");
-					temp.setFill(new ImagePattern(pic));
-				} else if (currMap[i][j] == 3) {
-					Image pause = new Image("pictures/pauseButton.png");
-					temp.setFill(new ImagePattern(pause));
-					temp.setOnMouseClicked(e -> {
-						if (controller.getGamePhase().equals("attack")) {
-							controller.changePaused();
-						}
-					});
-				} else if (currMap[i][j] == 4){
-					Image play = new Image("pictures/playButton.png");
-					temp.setFill(new ImagePattern(play));
-					temp.setOnMouseClicked(e -> {
-						if (controller.getGamePhase().equals("place")) {
-							
-							controller.startRound();
-						}
-					});
-				} else {
-					Image fastForward = new Image("pictures/fastForwardButton.png");
-					temp.setFill(new ImagePattern(fastForward));
-					temp.setOnMouseClicked(e -> {
-						if (controller.getGamePhase().equals("attack")) {
-							controller.increaseGameSpeed();
-						}
-					});
-				}
-				grid.add(temp, j, i);
-			}
-		}
-		border.setCenter(grid);
-		
-
-		roundLabel = new Text("Round 1");
-		HBox hbox = new HBox();
-		hbox.setAlignment(Pos.CENTER);
-		hbox.getChildren().add(roundLabel);
-		border.setTop(hbox);
-	}
-	
-	/**
-	 * Method to set the portrait of the gui depending on what
-	 * tower the user has clicked on most recently
-	 */
-	public void setPortrait() {
-		Rectangle portrait = new Rectangle();
-		portrait.setWidth(295);
-		portrait.setHeight(600);
-		Image currPortrait = new Image(currTowerClicked.getTowerPortrait());
-		portrait.setFill(new ImagePattern(currPortrait));
-		sideBar.getChildren().clear();
-		sideBar.getChildren().add(portrait);
-		
-		towerBox.getChildren().remove(towerText);
-		Image currName = new Image(currTowerClicked.getTowerName());
-		towerText.setFill(new ImagePattern(currName));
-		towerBox.getChildren().add(towerText);
-	}
-
-	/**
-	 * Method to find the (Rectangle) node at a given set of coordniates
-	 * in the grid.
-	 * @param x - x coordinate to search for the node
-	 * @param y - y coordinate to search for the node
-	 * @return the Rectangle node if there is one at the position, null otherwise
-	 */
-	public Rectangle findNode(int x, int y) {
-		for (Node node: grid.getChildren()) {
-			if(grid.getRowIndex(node) == x && grid.getColumnIndex(node) == y) {
-				Rectangle curr = (Rectangle) node;
-				return curr;
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * Private method that creates the dialog alert when the user has lost the
-	 * gamee, meaning the user's health has been depleted to 0. This alert gives
-	 * them an option to start a new game as well.
-	 */
-	private void showLost() {
-		Alert lossAlert = new Alert(AlertType.INFORMATION);
-		lossAlert.setHeaderText("Message");
-		lossAlert.setContentText("You lost! New Game?");
-		ButtonType newGame = new ButtonType("NewGame");
-		lossAlert.getButtonTypes().add(newGame);
-		Optional<ButtonType> option = lossAlert.showAndWait();
-		
-		if(option.get() == newGame) {
-			try {
-				start(stage);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-	}
-	
-	/**
-	 * Private method that creates the dialog alert when the user has won the
-	 * game. This alert gives them the option to start a new game.
-	 */
-	private void showWin() {
-		Alert winAlert = new Alert(AlertType.INFORMATION);
-		winAlert.setHeaderText("Winner!");
-		winAlert.setContentText("You Win! New Game?");
-		ButtonType newGame = new ButtonType("NewGame");
-		winAlert.getButtonTypes().add(newGame);
-		Optional<ButtonType> option = winAlert.showAndWait();
-		
-		if(option.get() == newGame) {
-			try {
-				start(stage);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-	}
-
-	/**
-	 * Method that helps the gui run the actual game logic from the controller.
-	 * It has varying behaviors depending on the phase of the game (attack or place)
-	 * and provides the most up to date graphic representation of the game being
-	 * played in the model.
-	 */
-	@Override
-	public void update(Observable o, Object arg) {
-		// in the place phase, determine if the user has won the game, and if not
-		// allow them to place towers and update the gui accordingly
-		if (controller.getGamePhase().equals("place")) {
-			if (arg == null) {
-				if (controller.getRound() == 3) {
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							showWin();
-						}
-					});
-					return;
-				}
-				String string = "Round " + Integer.toString(controller.getRound());
-				roundLabel.setText(string);
-			}else {
-				money.setText(Integer.toString(this.controller.getMoney()));
-				int[] coords = (int[]) arg;
-				Rectangle curr = findNode(coords[0], coords[1]);
-				Image pic = new Image(currTowerClicked.getTowerPic());
-		        curr.setFill(new ImagePattern(pic));
-			}
-		} else {
-			// in the attack phase, run the game as normal until the round
-			// is over or the user has died.
-			if(this.controller.getHealth() <= 0) {
-				lives.setText("0");
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						showLost();
-					}
-				});
-			} else {
-				lives.setText(Integer.toString(this.controller.getHealth()));
-			}
-			// have towers attack enemies, continue moving enemies along the path
-			// as long as they are alive
-			ArrayList<Enemy> enemies = (ArrayList<Enemy>) arg;
-			int[][] currMap = controller.getRoad().getMap();
-			this.controller.towerAttack();
-						
-			//FOR EACH TOWER
-			Tower[][] towerMap = controller.getTowerMap();
-			for (int i = 0; i < towerMap.length; i++) {
-				for (int j = 0; j < towerMap[i].length; j ++) {
-					// IF TOWER IS NOT EQUAL TO NULL
-					if (towerMap[i][j] != null) {
-						ArrayList<Enemy> enemiesList = towerMap[i][j].getEnemiesToAttack();
-						//SEARCH THROUGH ENEMIES NEXT TO CURRENT TOWER
-						for (int k = 0; k < enemiesList.size(); k++) {
-							Rectangle test = new Rectangle();
-							test.setWidth(10);
-							test.setHeight(10);
-							if (towerMap[i][j] instanceof RickTower) {
-								test.setFill(Color.GREENYELLOW);
-							}
-							else if (towerMap[i][j] instanceof JerryTower) {
-								test.setFill(Color.LIGHTSKYBLUE);
-							}
-							else if (towerMap[i][j] instanceof MortyTower) {
-								test.setFill(Color.RED);
-							}
-							else if (towerMap[i][j] instanceof MeeseeksTower) {
-								test.setFill(Color.SLATEBLUE);
-							}
-							else if (towerMap[i][j] instanceof SquanchyTower) {
-								test.setFill(Color.ORANGE);
-							}	
-							else if (towerMap[i][j] instanceof BirdPersonTower) {
-								test.setFill(Color.WHITE);
-							}	
-							Path path = new Path();
-							
-							//starting point
-							path.getElements().add(new MoveTo((towerMap[i][j].getX() * 47) + 23, (((towerMap[i][j].getY()) * 47) + 40)));
-							
-							//ending point
-							path.getElements().add(new LineTo((enemiesList.get(k).getY() * 47) + 23, ((enemiesList.get(k).getX() * 47)) + 40));
-							
-							PathTransition pathTransition = new PathTransition();
-							pathTransition.setDuration(Duration.millis(controller.getGameSpeed()));
-							pathTransition.setNode(test);
-							pathTransition.setPath(path);
-							pathTransition.setOnFinished((eventTest) -> {
-								border.getChildren().remove(test);
-							});
-							pathTransition.play();
-
-							Platform.runLater(new Runnable() {
-				                 @Override public void run() {
-				                     border.getChildren().add(test);
-				                 }
-				             });
-						}
-						towerMap[i][j].clearEnemies();
-					}
-				}
-			}
-					
-			for (int i = 0; i < currMap.length; i++) {
-				for (int j = 0; j < currMap[i].length; j++) {
-					boolean found  = false;
-					if (currMap[i][j] == 1) {
-						Rectangle curr = findNode(i, j);
-						for (int k = 0; k < enemies.size(); k++) {
-							Enemy currEnemy = enemies.get(k);
-							if (i == currEnemy.getX() && j == currEnemy.getY()) {
-								Image enemyPic = new Image(currEnemy.getTowerPic());
-								curr.setFill(new ImagePattern(enemyPic));
-								found = true;
-								break;
-							}
-						}
-						if (!found) {
-							Image pic = new Image("/pictures/road.png");
-							curr.setFill(new ImagePattern(pic));
-						}
-					}
-
-				}
-			}
-			money.setText(Integer.toString(this.controller.getMoney()));
 		}
 	}
 }

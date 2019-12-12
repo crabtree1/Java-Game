@@ -1,3 +1,5 @@
+import java.io.Serializable;
+
 import java.util.ArrayList;
 /**
  * Tower class that defines the base behavior for all of the tower classes. It contains

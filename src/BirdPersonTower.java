@@ -6,6 +6,8 @@
  */
 public class BirdPersonTower extends Tower{
 	
+	public static final int type = 0;
+	
 	/**
 	 * Constructor for the bird person class
 	 */

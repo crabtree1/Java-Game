@@ -7,6 +7,8 @@
  */
 public class RickTower extends Tower {
 	
+	public static final int type = 4;
+	
 	/**
 	 * Constructor for the Rick tower
 	 */
