@@ -77,7 +77,8 @@ public class TowerDefenseView extends Application implements Observer {
 	private Stage stage;
 	private Text roundLabel;
 	private boolean isMultiplayer = false;
-	TwoPlayerDialogBox dialogBox;
+	private TwoPlayerDialogBox dialogBox;
+	private Clip introClip;
 	
 	/**
 	 * Method to launch the gui and set all proper menus and pictures
@@ -91,7 +92,7 @@ public class TowerDefenseView extends Application implements Observer {
 		
 		stage.setTitle("Rick and Morty Tower Defense");
 		
-		Clip introClip = this.createAudioClip("src/sounds/intro.wav");
+		introClip = this.createAudioClip("src/sounds/intro.wav");
 		
 		border = new BorderPane();
 		Rectangle mainMenu = new Rectangle();
@@ -155,7 +156,6 @@ public class TowerDefenseView extends Application implements Observer {
 				setupNetwork();
 				isMultiplayer = true;
 				controller.setMulitplayer(isMultiplayer);
-				//controller.setRoad(new Road1());
 				if(dialogBox.createType()) {
 					startGame();
 				}
@@ -455,6 +455,7 @@ public class TowerDefenseView extends Application implements Observer {
 				socket = new Socket(this.dialogBox.getAddress(), this.dialogBox.getPort());
 				controller.setTurn(false);
 				controller.setIsClient(true);
+				introClip.stop();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
