@@ -370,6 +370,18 @@ public class TowerDefenseView extends Application implements Observer {
 							} else if (currTowerClicked instanceof SquanchyTower) {
 								Clip squanchy = this.createAudioClip("src/sounds/Squanchy.wav");
 								squanchy.start();
+							} else if (currTowerClicked instanceof RickTower) {
+								Clip rick = this.createAudioClip("src/sounds/Rick.wav");
+								rick.start();
+							} else if (currTowerClicked instanceof MortyTower) {
+								Clip morty = this.createAudioClip("src/sounds/Morty.wav");
+								morty.start();
+							} else if (currTowerClicked instanceof JerryTower) {
+								Clip jerry = this.createAudioClip("src/sounds/Jerry.wav");
+								jerry.start();
+							} else if (currTowerClicked instanceof BirdPersonTower) {
+								Clip birdperson = this.createAudioClip("src/sounds/Birdperson.wav");
+								birdperson.start();
 							}
 						}
 						
