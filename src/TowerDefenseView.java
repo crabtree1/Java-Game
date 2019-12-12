@@ -10,6 +10,7 @@
  * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -17,6 +18,14 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Optional;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import javafx.animation.PathTransition;
 import javafx.application.Application;
@@ -68,7 +77,8 @@ public class TowerDefenseView extends Application implements Observer {
 	private Stage stage;
 	private Text roundLabel;
 	private boolean isMultiplayer = false;
-	TwoPlayerDialogBox dialogBox;
+	private TwoPlayerDialogBox dialogBox;
+	private Clip introClip;
 	
 	/**
 	 * Method to launch the gui and set all proper menus and pictures
@@ -82,6 +92,8 @@ public class TowerDefenseView extends Application implements Observer {
 		
 		stage.setTitle("Rick and Morty Tower Defense");
 		
+		introClip = this.createAudioClip("src/sounds/intro.wav");
+		
 		border = new BorderPane();
 		Rectangle mainMenu = new Rectangle();
 		mainMenu.setWidth(1000);
@@ -92,13 +104,22 @@ public class TowerDefenseView extends Application implements Observer {
 				Image mapSelection = new Image("pictures/mapSelection.png");
 				mainMenu.setFill(new ImagePattern(mapSelection));
 				mainMenu.setOnMouseClicked((event2) -> {
+					Clip backgroundMusic = this.createAudioClip("src/sounds/background.wav");
 					if (event2.getX() > 75 && event2.getX() < 453 && event2.getY() > 100 && event2.getY() < 611) {
+						introClip.stop();
 						controller.setRoad(new Road1());
 						startGame();
+						Clip map1Clip = this.createAudioClip("src/sounds/Show me what you got.wav");
+						map1Clip.start();
+						backgroundMusic.start();
 					}
 					else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
+						introClip.stop();
 						controller.setRoad(new Road2());
 						startGame();
+						Clip map2Clip = this.createAudioClip("src/sounds/get Schwifty.wav");
+						map2Clip.start();
+						backgroundMusic.start();
 					}
 				});
 			}
@@ -109,16 +130,25 @@ public class TowerDefenseView extends Application implements Observer {
 					Image mapSelection = new Image("pictures/mapSelection.png");
 					mainMenu.setFill(new ImagePattern(mapSelection));
 					mainMenu.setOnMouseClicked((event2) -> {
+						Clip backgroundMusic = this.createAudioClip("src/sounds/background.wav");
 						if (event2.getX() > 75 && event2.getX() < 453 && event2.getY() > 100 && event2.getY() < 611) {
+							introClip.stop();
 							controller.setRoad(new Road1());
 							controller.sendMap(new TDNetworkMessage(1));
 							startGame();
+							Clip map1Clip = this.createAudioClip("src/sounds/Show me what you got.wav");
+							map1Clip.start();
+							backgroundMusic.start();
 							model.setNetworked(true);
 						}
 						else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
+							introClip.stop();
 							controller.setRoad(new Road2());
 							controller.sendMap(new TDNetworkMessage(2));
 							startGame();
+							Clip map2Clip = this.createAudioClip("src/sounds/get Schwifty.wav");
+							map2Clip.start();
+							backgroundMusic.start();
 							model.setNetworked(true);
 						}
 					});
@@ -126,7 +156,6 @@ public class TowerDefenseView extends Application implements Observer {
 				setupNetwork();
 				isMultiplayer = true;
 				controller.setMulitplayer(isMultiplayer);
-				//controller.setRoad(new Road1());
 				if(dialogBox.createType()) {
 					startGame();
 				}
@@ -141,6 +170,26 @@ public class TowerDefenseView extends Application implements Observer {
 		Scene scene = new Scene(border, 1000, 727);
 		stage.setScene(scene);
 		stage.show();
+		
+		introClip.start();
+		introClip.loop(30);
+		
+	}
+	
+	private Clip createAudioClip(String fileName) {
+		File audioFile = new File(fileName);
+		AudioInputStream aio;
+		Clip audioClip = null;
+		try {
+			aio = AudioSystem.getAudioInputStream(audioFile);
+			AudioFormat format = aio.getFormat();
+			DataLine.Info info = new DataLine.Info(Clip.class, format);
+			audioClip = (Clip) AudioSystem.getLine(info);
+			audioClip.open(aio);
+		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+			e.printStackTrace();
+		}
+		return audioClip;
 	}
 	
 	/**
@@ -315,6 +364,25 @@ public class TowerDefenseView extends Application implements Observer {
 					} else {
 						if (currTowerClicked != null) {
 							controller.addTower(currTowerClicked, event.getSceneX(), event.getSceneY());
+							if(currTowerClicked instanceof MeeseeksTower) {
+								Clip meeseeks = this.createAudioClip("src/sounds/Meeseeks.wav");
+								meeseeks.start();
+							} else if (currTowerClicked instanceof SquanchyTower) {
+								Clip squanchy = this.createAudioClip("src/sounds/Squanchy.wav");
+								squanchy.start();
+							} else if (currTowerClicked instanceof RickTower) {
+								Clip rick = this.createAudioClip("src/sounds/Rick.wav");
+								rick.start();
+							} else if (currTowerClicked instanceof MortyTower) {
+								Clip morty = this.createAudioClip("src/sounds/Morty.wav");
+								morty.start();
+							} else if (currTowerClicked instanceof JerryTower) {
+								Clip jerry = this.createAudioClip("src/sounds/Jerry.wav");
+								jerry.start();
+							} else if (currTowerClicked instanceof BirdPersonTower) {
+								Clip birdperson = this.createAudioClip("src/sounds/Birdperson.wav");
+								birdperson.start();
+							}
 						}
 						
 					}
@@ -399,6 +467,7 @@ public class TowerDefenseView extends Application implements Observer {
 				socket = new Socket(this.dialogBox.getAddress(), this.dialogBox.getPort());
 				controller.setTurn(false);
 				controller.setIsClient(true);
+				introClip.stop();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

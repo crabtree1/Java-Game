@@ -6,6 +6,7 @@
  * attack enemies, enemeis are generated and moved, and towers can be placed.
  * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
  */
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -204,7 +205,7 @@ public class TowerDefenseModel extends Observable{
 			if (pathToFollow[i][0] == enemyCoords[0] && pathToFollow[i][1] == enemyCoords[1]) {
 				e.setCords(pathToFollow[i+1][0], pathToFollow[i+1][1]);
 				return;
-			}
+			} 
 		}
 		if(e.getHealth() > 0) {
 			this.health -= e.getHealth();
