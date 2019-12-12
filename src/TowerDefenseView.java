@@ -265,7 +265,7 @@ public class TowerDefenseView extends Application implements Observer {
 			}
 		});
 		moneyLivesBox.getChildren().add(sellButton);
-				
+	
 		VBox rickTowerBox = new VBox();
 		rickTowerBox.setMinWidth(100);
 		rickTowerBox.setMinHeight(100);
