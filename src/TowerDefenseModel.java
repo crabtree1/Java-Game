@@ -288,7 +288,6 @@ public class TowerDefenseModel extends Observable{
 	}
 	
 	public void removeTowerNetwork(int x, int y) {
-		System.out.print("Removing Via Network");
 		towerMap[x][y] = null;
 		//this.money += currTowerClicked.getCost()/2;
 		
@@ -399,7 +398,6 @@ public class TowerDefenseModel extends Observable{
 							
 						if (hasEnemy) {
 							enemiesHit ++;
-							//System.out.println(towers[i][j].attackPower);
 								
 							if (towerMap[i][j] instanceof MeeseeksTower) {
 								int damageMultiplier = (int) (Math.random() * 100);

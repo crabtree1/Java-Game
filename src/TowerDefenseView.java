@@ -458,7 +458,6 @@ public class TowerDefenseView extends Application implements Observer {
 				ServerSocket server = new ServerSocket(this.dialogBox.getPort());
 				socket = server.accept();
 				server.close();
-				System.out.println("Server");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

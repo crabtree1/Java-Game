@@ -68,7 +68,6 @@ public class TowerDefenseController {
 				while(true) {
 					otherMessage = null;
 					try {
-						//System.out.println(isTurn);
 						Object other = ois.readObject();
 						// after reading the object, it sends an update event to the main thread to update the gui
 						Platform.runLater(new Runnable() {
@@ -77,13 +76,10 @@ public class TowerDefenseController {
 								if(other instanceof TDNetworkMessage) {
 									otherMessage = (TDNetworkMessage) other;
 								} else if (other instanceof ArrayList<?>) {
-									System.out.println("Here");
 									model.setEnemies((ArrayList<Enemy>)other);
-									System.out.println(((ArrayList)other).size());
 									return;
 								}
 								if(otherMessage.isPlaying()) {
-									System.out.println("Here");
 									startRound();
 								} else if(otherMessage.isPuased()) {
 									changePaused();
@@ -179,7 +175,6 @@ public class TowerDefenseController {
 	}
 	
 	public void sendPlay() {
-		System.out.print("Here1");
 		try {
 			oos.writeObject(new TDNetworkMessage(true));
 		} catch (IOException e) {
@@ -188,7 +183,6 @@ public class TowerDefenseController {
 	}
 	
 	public void sendSeeds() {
-		System.out.print("Here1");
 		try {
 			oos.writeObject(new TDNetworkMessage(model.getSeed1(), model.getSeed2()));
 		} catch (IOException e) {
@@ -285,7 +279,6 @@ public class TowerDefenseController {
 	 * @param mouseY - y coordinate of where the user clicked in the gui
 	 */
 	public void addTower(Tower currTowerClicked, double mouseX, double mouseY) {
-		//System.out.println("Here1" + isTurn);
 		if(!isTurn) {
 			return;
 		}
