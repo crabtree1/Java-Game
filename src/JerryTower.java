@@ -6,7 +6,7 @@
  *
  */
 public class JerryTower extends Tower {
-	public static final int type = 1;
+
 	/**
 	 * Constructor for the jerry tower
 	 */

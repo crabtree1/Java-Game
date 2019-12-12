@@ -7,8 +7,6 @@
  */
 public class MortyTower extends Tower {
 	
-	public static final int type = 3;
-	
 	/**
 	 * Constructor for the morty towers
 	 */

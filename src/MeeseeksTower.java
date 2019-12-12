@@ -8,8 +8,6 @@
  */
 public class MeeseeksTower extends Tower {
 
-	public static final int type = 2;
-	
 	/**
 	 * Constructor for the meeseeks tower
 	 */
