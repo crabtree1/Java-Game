@@ -7,8 +7,11 @@
  * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
  */
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.Random;
 
 public class TowerDefenseModel extends Observable{
 
@@ -24,7 +27,12 @@ public class TowerDefenseModel extends Observable{
 	private int[][] pathToFollow;
 	private int round = 1;
 	private int probability = 1;
+	private long seed1;
+	private long seed2;
 	private boolean isClient = false;
+	private boolean isNetworked = false;
+	
+	private ObjectOutputStream oos;
 	
 	/**
 	 * Constructor for the tower defense model
@@ -88,12 +96,25 @@ public class TowerDefenseModel extends Observable{
 	 * towers, the round increases, and the number of enemies in the next round increases.
 	 */
 	public void startRound() {
-		this.createEnemy();
 		gamePhase = "attack";
 		Thread thread = new Thread(){
 			public void run() {
 				int i = 0;
 				while(i < roundEnemies || enemyMap.size() != 0) {
+					if(!isClient) {
+						Random randSeed = new Random();
+						seed1 = randSeed.nextLong();
+						seed2 = randSeed.nextLong();
+						if(isNetworked) {
+							try {
+								oos.writeObject(new TDNetworkMessage(getSeed1(), getSeed2()));
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+					Random rand = new Random(seed1);
+					Random rand1 = new Random(seed2);
 					if(getHealth() < 0) {
 						enemyMap = new ArrayList<Enemy>();
 						break;
@@ -101,6 +122,12 @@ public class TowerDefenseModel extends Observable{
 					int speedToSleep = 40;
 					if (!paused) {
 						moveEnemies();
+						int createProb = (int) (rand.nextDouble() * 4);
+						if (createProb < probability && i < roundEnemies) {
+							int randomEnemy = ((int) (rand1.nextDouble() * 5)) + 1;
+							createEnemy(randomEnemy);
+							i += 1;
+						}
 						speedToSleep = gameSpeed;
 					}
 					
@@ -127,48 +154,25 @@ public class TowerDefenseModel extends Observable{
 	 * adds this new enemy to the enemy list.
 	 * @param randomEnemy - specifies the type of enemy to create
 	 */
-	public void createEnemy() {
-		if(isClient) {
-			return;
-			
-		}
+	public void createEnemy(int randomEnemy) {
 		if(health < 0) {
 			return;
 		}
 		Enemy enemy = null;
-		int randomEnemy = 1;
-		int y = road.getStartingPos()[1];
-		int i = 0;
-		while (i < roundEnemies) {
-			randomEnemy = 0;
-			int createProb = (int) (Math.random()*4);
-			if (createProb < probability && i < roundEnemies) {
-				randomEnemy = ((int) (Math.random() * 5)) + 1;
-				i += 1;
-			}
-			if (randomEnemy == 1) {
-				enemy = new PickelRickEnemy();
-				enemy.setCords(road.getStartingPos()[0], y);
-				enemyMap.add(enemy);
-			} else if  (randomEnemy == 2){
-				enemy = new ToxicRickEnemy();
-				enemy.setCords(road.getStartingPos()[0], y);
-				enemyMap.add(enemy);
-			} else if (randomEnemy == 3) {
-				enemy  = new DoofusRickEnemy();
-				enemy.setCords(road.getStartingPos()[0], y);
-				enemyMap.add(enemy);
-			} else if (randomEnemy == 4) {
-				enemy = new EvilRickEnemy();
-				enemy.setCords(road.getStartingPos()[0], y);
-				enemyMap.add(enemy);
-			} else if(randomEnemy == 5){
-				enemy = new GuardRickEnemy();
-				enemy.setCords(road.getStartingPos()[0], y);
-				enemyMap.add(enemy);
-			}
-			y --;
+		//int randomEnemy = 1;
+		if (randomEnemy == 1) {
+			enemy = new PickelRickEnemy();
+		} else if  (randomEnemy == 2){
+			enemy = new ToxicRickEnemy();
+		} else if (randomEnemy == 3) {
+			enemy  = new DoofusRickEnemy();
+		} else if (randomEnemy == 4) {
+			enemy = new EvilRickEnemy();
+		} else if(randomEnemy == 5){
+			enemy = new GuardRickEnemy();
 		}
+		enemy.setCords(road.getStartingPos()[0], road.getStartingPos()[1]);
+		enemyMap.add(enemy);
 	}
 	
 	/**
@@ -348,6 +352,7 @@ public class TowerDefenseModel extends Observable{
 		//Tower[][] towers = controller.getTowerMap();
 		for (int i = 0; i < towerMap.length; i ++) {
 			for (int j = 0; j < towerMap[i].length; j ++) {
+				int enemiesHit = 0;
 				for (int k = 0; k < enemyMap.size(); k ++) {
 					Enemy currEnemy = enemyMap.get(k);
 					if (towerMap[i][j] != null) {
@@ -355,8 +360,7 @@ public class TowerDefenseModel extends Observable{
 						hasEnemy = false;
 						if (towerMap[i][j] instanceof BirdPersonTower) {
 							currEnemy.takeDamage(1);
-							//System.out.println(currEnemy.getHealth());
-							
+							towerMap[i][j].addEnemy(currEnemy);
 						} 
 						//below
 						else if (currEnemy.getX() == i + 1 && currEnemy.getY() == j) {
@@ -400,6 +404,7 @@ public class TowerDefenseModel extends Observable{
 						}
 							
 						if (hasEnemy) {
+							enemiesHit ++;
 							//System.out.println(towers[i][j].attackPower);
 								
 							if (towerMap[i][j] instanceof MeeseeksTower) {
@@ -418,20 +423,22 @@ public class TowerDefenseModel extends Observable{
 								}
 							} else if (towerMap[i][j] instanceof JerryTower && currEnemy
 									instanceof DoofusRickEnemy) {
-								currEnemy.takeDamage(towerMap[i][j].attackPower * 2);
+								currEnemy.takeDamage(100);
 							} else {
 								currEnemy.takeDamage(towerMap[i][j].attackPower);
-								//System.out.println(currEnemy.getHealth());
 							}
 						}
-						if((currEnemy.getHealth() < temp) && (currEnemy.getHealth() != 0)) {
-							addAttackMoney();
-						}
 						if (currEnemy.getHealth() <= 0) {
+							addAttackMoney();
 							currEnemy.setAlive(false);
 							enemyMap.remove(currEnemy);
 
 						}
+					}
+					// if it is not a rick tower and the tower has attacked the farthest
+					// enemy ahead, break from the enemy loop
+					if (!(towerMap[i][j] instanceof RickTower) && enemiesHit == 1) {
+						break;
 					}
 				}
 			}
@@ -488,5 +495,29 @@ public class TowerDefenseModel extends Observable{
 	
 	public boolean isClient() {
 		return isClient;
+	}
+	
+	public void setSeed1(Long seed1) {
+		this.seed1 = seed1;
+	}
+	
+	public void setSeed2(Long seed2) {
+		this.seed2 = seed2;
+	}
+	
+	public Long getSeed1() {
+		return this.seed1;
+	}
+	
+	public Long getSeed2() {
+		return this.seed2;
+	}
+	
+	public void setOOS(ObjectOutputStream oos) {
+		this.oos = oos;
+	}
+	
+	public void setNetworked(boolean isNetworked) {
+		this.isNetworked = isNetworked;
 	}
 }

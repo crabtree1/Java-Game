@@ -133,6 +133,7 @@ public class TowerDefenseView extends Application implements Observer {
 							startGame();
 							Clip map1Clip = this.createAudioClip("src/sounds/Show me what you got.wav");
 							map1Clip.start();
+							model.setNetworked(true);
 						}
 						else if (event2.getX() > 546 && event2.getX() < 924 && event2.getY() > 100 && event2.getY() < 611) {
 							introClip.stop();
@@ -141,6 +142,7 @@ public class TowerDefenseView extends Application implements Observer {
 							startGame();
 							Clip map2Clip = this.createAudioClip("src/sounds/get Schwifty.wav");
 							map2Clip.start();
+							model.setNetworked(true);
 						}
 					});
 				}
@@ -166,11 +168,6 @@ public class TowerDefenseView extends Application implements Observer {
 		introClip.start();
 		introClip.loop(30);
 		
-		//playGame();
-		
-		//AudioInputStream aio = AudioSystem.getAudioInputStream(new File("intro.mp3"));
-		//Clip clip = AudioSystem.getClip();
-		//clip.start();
 	}
 	
 	private Clip createAudioClip(String fileName) {
@@ -399,7 +396,7 @@ public class TowerDefenseView extends Application implements Observer {
 							if(isMultiplayer) {
 								if(!dialogBox.createType()) {
 									controller.startRound();
-									controller.sendEnimies();
+									//controller.sendEnimies();
 									controller.sendPlay();
 								}
 							} else {
@@ -589,36 +586,50 @@ public class TowerDefenseView extends Application implements Observer {
 			} else {
 				lives.setText(Integer.toString(this.controller.getHealth()));
 			}
+			// have towers attack enemies, continue moving enemies along the path
+			// as long as they are alive
 			ArrayList<Enemy> enemies = (ArrayList<Enemy>) arg;
 			int[][] currMap = controller.getRoad().getMap();
 			this.controller.towerAttack();
-			
-			// ANIMATION
-			
+						
 			//FOR EACH TOWER
 			Tower[][] towerMap = controller.getTowerMap();
 			for (int i = 0; i < towerMap.length; i++) {
 				for (int j = 0; j < towerMap[i].length; j ++) {
 					// IF TOWER IS NOT EQUAL TO NULL
 					if (towerMap[i][j] != null) {
-						//System.out.println("(" + i + ", " + j + ")");
 						ArrayList<Enemy> enemiesList = towerMap[i][j].getEnemiesToAttack();
 						//SEARCH THROUGH ENEMIES NEXT TO CURRENT TOWER
-						//System.out.println(enemiesList.size());
 						for (int k = 0; k < enemiesList.size(); k++) {
-							//*animation part*
 							Rectangle test = new Rectangle();
 							test.setWidth(10);
 							test.setHeight(10);
-							test.setFill(Color.RED);
+							if (towerMap[i][j] instanceof RickTower) {
+								test.setFill(Color.GREENYELLOW);
+							}
+							else if (towerMap[i][j] instanceof JerryTower) {
+								test.setFill(Color.LIGHTSKYBLUE);
+							}
+							else if (towerMap[i][j] instanceof MortyTower) {
+								test.setFill(Color.RED);
+							}
+							else if (towerMap[i][j] instanceof MeeseeksTower) {
+								test.setFill(Color.SLATEBLUE);
+							}
+							else if (towerMap[i][j] instanceof SquanchyTower) {
+								test.setFill(Color.ORANGE);
+							}	
+							else if (towerMap[i][j] instanceof BirdPersonTower) {
+								test.setFill(Color.WHITE);
+							}	
 							Path path = new Path();
 							
 							//starting point
 							path.getElements().add(new MoveTo((towerMap[i][j].getX() * 47) + 23, (((towerMap[i][j].getY()) * 47) + 40)));
+							
 							//ending point
 							path.getElements().add(new LineTo((enemiesList.get(k).getY() * 47) + 23, ((enemiesList.get(k).getX() * 47)) + 40));
 							
-							//******DO NOT TOUCH************
 							PathTransition pathTransition = new PathTransition();
 							pathTransition.setDuration(Duration.millis(controller.getGameSpeed()));
 							pathTransition.setNode(test);
@@ -633,15 +644,12 @@ public class TowerDefenseView extends Application implements Observer {
 				                     border.getChildren().add(test);
 				                 }
 				             });
-							//***********************************
 						}
 						towerMap[i][j].clearEnemies();
 					}
 				}
 			}
-		
-			// ANIMATION
-			
+					
 			for (int i = 0; i < currMap.length; i++) {
 				for (int j = 0; j < currMap[i].length; j++) {
 					boolean found  = false;

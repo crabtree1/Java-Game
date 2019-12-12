@@ -46,6 +46,7 @@ public class TowerDefenseController {
 		 try {
 			this.oos = new ObjectOutputStream(socket.getOutputStream());
 			this.ois = new ObjectInputStream(socket.getInputStream());
+			model.setOOS(oos);
 		} catch (IOException e) {
 		}
 	}
@@ -82,11 +83,15 @@ public class TowerDefenseController {
 									return;
 								}
 								if(otherMessage.isPlaying()) {
+									System.out.println("Here");
 									startRound();
 								} else if(otherMessage.isPuased()) {
 									changePaused();
 								} else if(otherMessage.isRemoving()) {
 									model.removeTowerNetwork(otherMessage.getRow(), otherMessage.getColumn());
+								} else if (otherMessage.getSeed1() != null) {
+									model.setSeed1(otherMessage.getSeed1());
+									model.setSeed2(otherMessage.getSeed2());
 								} else if(otherMessage.getTower() == 0) {
 									image = new Image(new BirdPersonTower().getTowerPic());
 									model.addTower(new BirdPersonTower(), otherMessage.getRow(), otherMessage.getColumn());
@@ -182,9 +187,10 @@ public class TowerDefenseController {
 		}
 	}
 	
-	public void sendEnimies() {
+	public void sendSeeds() {
+		System.out.print("Here1");
 		try {
-			oos.writeObject(model.getEnemies());
+			oos.writeObject(new TDNetworkMessage(model.getSeed1(), model.getSeed2()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -304,6 +310,7 @@ public class TowerDefenseController {
 				row = i;
 			}
 		}
+		
 		if (currTowerClicked instanceof BirdPersonTower) {
 			currTowerClicked = new BirdPersonTower();
 		} else if (currTowerClicked instanceof JerryTower) {
@@ -480,7 +487,11 @@ public class TowerDefenseController {
 		}
 	}
 	
-	public Integer getGameSpeed() {
+	/**
+	 * Getter to return the current game speed of the model
+	 * @return the game speed from the model
+	 */
+public int getGameSpeed() {
 		return this.model.getGameSpeed();
 	}
 }

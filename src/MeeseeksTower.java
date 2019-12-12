@@ -16,7 +16,7 @@ public class MeeseeksTower extends Tower {
 	public MeeseeksTower() {
 		super();
 		this.cost = 10;
-		this.attackPower = 25;
+		this.attackPower = 5;
 		this.towerPic = "pictures/meeseeks.png";
 		this.towerPortrait = "pictures/meeseeksportrait.png";
 		this.towerName = "pictures/meeseeksText.png";

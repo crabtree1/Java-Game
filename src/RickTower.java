@@ -1,6 +1,6 @@
 /**
  * RickTower is a subclass of Tower. Rick towers are very reliable. When in 
- * danger, Rick Tower will always dole out 10 points of damage to any enemies
+ * danger, Rick Tower will always dole out 3 point of damage to any enemies
  * in its range.
  * @author David Gonzales, Mario Verdugo, Luke Cernetic, Chris Crabtree
  *
@@ -14,7 +14,8 @@ public class RickTower extends Tower {
 	 */
 	public RickTower() {
 		super();
-		this.attackPower = 10;
+		this.attackPower = 3;
+		this.cost = 15;
 		this.towerPic = "pictures/rick.png";
 		this.towerPortrait = "pictures/rickportrait.png";
 		this.towerName = "pictures/rickText.png";

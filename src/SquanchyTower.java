@@ -14,8 +14,8 @@ public class SquanchyTower extends Tower {
 	 */
 	public SquanchyTower() {
 		super();
-		this.cost = 15;
-		this.attackPower = 15;
+		this.cost = 10;
+		this.attackPower = 1;
 		this.towerPic = "pictures/squanchy.png";
 		this.towerPortrait = "pictures/squanchyportrait.png";
 		this.towerName = "pictures/squanchyText.png";
