@@ -1,5 +1,4 @@
-# csc335-towerdef-lacernetic-crabtree1-davidgonzales-mv7757
-csc335-towerdef-lacernetic-crabtree1-davidgonzales-mv7 created by GitHub Classroom
+Rick and Morty Tower Defense for CSC 335
 
 TO PLAY THE GAME: Open the TowerDefense.java file and run it. Once you are at the title screen, select a gamemode, single or multiplayer.
 
